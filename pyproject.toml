@@ -1,0 +1,17 @@
+[project]
+name = "lab-paper"
+version = "0.1.0"
+description = "Shared Markdown-to-Word paper build tooling for lab projects"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+lab-paper = "lab_paper.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true

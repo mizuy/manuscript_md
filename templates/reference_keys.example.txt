@@ -1,0 +1,2 @@
+# pandoc-id list for reference/ ingest (1 key per line)
+# New md files under reference/md/ are auto-appended on ingest.

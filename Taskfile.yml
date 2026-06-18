@@ -1,0 +1,86 @@
+version: "3"
+
+vars:
+  PYTHON: uv run python
+  PAPER_DIR: '{{.PAPER_DIR | default ""}}'
+  PAPERPILE_BIB: '{{.PAPERPILE_BIB | default "/Users/mizuy/lab/vault/paperpile.bib"}}'
+  PANDOC: '{{.PANDOC | default "pandoc"}}'
+  PANDOC_FLAGS: '{{.PANDOC_FLAGS | default ""}}'
+  PAPER_CSL: '{{.PAPER_CSL | default "vancouver.csl"}}'
+  PAPER_PANDOC_FROM: '{{.PAPER_PANDOC_FROM | default "markdown+lists_without_preceding_blankline+fenced_divs"}}'
+  PAPER_REFERENCE_DOC: '{{.PAPER_REFERENCE_DOC | default "reference.docx"}}'
+  FILES: '{{.FILES | default "manuscript"}}'
+  OVERWRITE: '{{.OVERWRITE | default "0"}}'
+  CSL_PATH:
+    sh: 'test -n "{{.PAPER_DIR}}" && uv run lab-paper resolve-csl "{{.PAPER_CSL}}" --paper-dir "{{.PAPER_DIR}}"'
+
+tasks:
+  paper:check-dir:
+    internal: true
+    cmds:
+      - >-
+        test -n "{{.PAPER_DIR}}" ||
+        (echo "PAPER_DIR is required, e.g. task paper:docx PAPER_DIR=/path/to/research-repo/paper" >&2; exit 2)
+      - >-
+        test -d "{{.PAPER_DIR}}" ||
+        (echo "PAPER_DIR does not exist: {{.PAPER_DIR}}" >&2; exit 2)
+
+  paper:sync-assets:
+    desc: Sync reusable Lua filters into PAPER_DIR
+    deps:
+      - paper:check-dir
+    cmds:
+      - uv run lab-paper sync-assets --paper-dir "{{.PAPER_DIR}}" {{if eq .OVERWRITE "1"}}--overwrite{{end}}
+
+  paper:build-bib:
+    desc: Build references.bib from manuscript citations and paperpile.bib
+    deps:
+      - paper:check-dir
+    cmds:
+      - >-
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper build-bib
+        --paper-dir "{{.PAPER_DIR}}"
+        --scan-markdown
+        --paperpile-bib "{{.PAPERPILE_BIB}}"
+        -o "{{.PAPER_DIR}}/references.bib"
+
+  paper:docx:
+    desc: Build PAPER_DIR/*.md to docx with citeproc and Word table patching
+    deps:
+      - paper:check-dir
+    cmds:
+      - task: paper:sync-assets
+        vars:
+          PAPER_DIR: "{{.PAPER_DIR}}"
+      - task: paper:build-bib
+        vars:
+          PAPER_DIR: "{{.PAPER_DIR}}"
+          PAPERPILE_BIB: "{{.PAPERPILE_BIB}}"
+      - for: { var: FILES }
+        cmd: >-
+          uv run lab-paper expand-imports
+          "{{.PAPER_DIR}}/{{.ITEM}}.md"
+          -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
+          && cd "{{.PAPER_DIR}}"
+          && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
+          --lua-filter=script/filters/pagebreak.lua
+          --lua-filter=script/filters/landscape.lua
+          --lua-filter=script/filters/table_word.lua
+          --lua-filter=script/filters/superscript.lua
+          --reference-doc="{{.PAPER_REFERENCE_DOC}}"
+          --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
+          ".build/{{.ITEM}}.md" -o "{{.ITEM}}.docx"
+          && cd "{{.TASKFILE_DIR}}"
+          && uv run lab-paper patch-docx "{{.PAPER_DIR}}/{{.ITEM}}.docx"
+
+  paper:words:
+    desc: Count abstract and main-text words in PAPER_DIR/manuscript.md
+    deps:
+      - paper:check-dir
+    cmds:
+      - uv run lab-paper word-count --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
+
+  paper:csl:
+    desc: Resolve or list bundled CSL files
+    cmds:
+      - uv run lab-paper resolve-csl "{{.PAPER_CSL}}" --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
