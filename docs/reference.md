@@ -1,12 +1,15 @@
-# lab-paper Reference
+# manuscript_md Reference
 
-`lab-paper` builds a Markdown paper directory into Word docx output.
+**manuscript_md** (`lab-paper` CLI) builds a Markdown paper directory into Word docx output.
 
 ## Paths
 
 | Item | Path |
 |------|------|
-| Project root | `/Users/mizuy/lab/paper` |
+| Project root (manuscript_md) | `/Users/mizuy/lab/paper` |
+| Cursor skill | `cursor-skill/manuscript_md/SKILL.md` |
+| Supplementary policy | `docs/SUPPLEMENTARY_POLICY.md` |
+| Submission checklist | `docs/SUBMISSION_CHECKLIST.md` |
 | Bundled Lua filters | `/Users/mizuy/lab/paper/filters/*.lua` |
 | Bundled CSL files | `/Users/mizuy/lab/paper/csl/*.csl` |
 | Bundled templates | `/Users/mizuy/lab/paper/templates/` |

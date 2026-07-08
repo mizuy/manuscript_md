@@ -53,3 +53,4 @@ If a paper needs custom widths, copy `filters/table_word.lua` into the paper dir
 - data columns: centered
 - all cells: vertically centered
 - compact paragraph spacing inside table cells
+- 10 pt font (`TableCompact` style)

@@ -1,5 +1,5 @@
 # Snippet: merge into a research repository Taskfile.yml when you want local
-# wrapper tasks. The implementation remains in /Users/mizuy/lab/paper.
+# wrapper tasks. The implementation remains in /Users/mizuy/lab/paper (manuscript_md).
 
 vars:
   PAPER_PROJECT: '{{.PAPER_PROJECT | default "../paper"}}'
@@ -8,7 +8,7 @@ vars:
 
 tasks:
   paper:docx:
-    desc: Delegate Markdown-to-Word build to lab/paper
+    desc: Delegate Markdown-to-Word build to manuscript_md (lab/paper)
     vars:
       FILES: '{{.FILES | default "manuscript supplementary"}}'
       PAPER_CSL: '{{.PAPER_CSL | default "vancouver.csl"}}'
@@ -30,7 +30,7 @@ tasks:
         FILES="{{.FILES}}"
 
   paper:words:
-    desc: Delegate manuscript word count to lab/paper
+    desc: Delegate manuscript word count to manuscript_md (lab/paper)
     cmds:
       - >-
         task --taskfile "{{.PAPER_PROJECT}}/Taskfile.yml" --dir "{{.PAPER_PROJECT}}"

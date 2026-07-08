@@ -1,6 +1,6 @@
 # Paper Directory Layout
 
-This is the recommended layout for a Markdown paper directory built with `lab-paper`.
+This is the recommended layout for a Markdown paper directory built with **manuscript_md** (`lab-paper` CLI).
 
 ```text
 paper/

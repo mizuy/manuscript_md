@@ -25,6 +25,8 @@ TABLE_COMPACT_SPACING = {
     "w:after": "60",
     "w:before": "20",
 }
+# Word font size is half-points: 10 pt = 20.
+TABLE_FONT_SIZE = "20"
 FONT_ATTRS = {
     f"{{{W_NS}}}ascii": "Helvetica",
     f"{{{W_NS}}}hAnsi": "Helvetica",
@@ -76,8 +78,15 @@ def _set_single_spacing(ppr: ET.Element) -> None:
     _set_spacing(ppr, SINGLE_SPACING)
 
 
+def _set_font_size(rpr: ET.Element, half_points: str) -> None:
+    sz = _find_or_create(rpr, "sz")
+    sz.set(_w("val"), half_points)
+    sz_cs = _find_or_create(rpr, "szCs")
+    sz_cs.set(_w("val"), half_points)
+
+
 def _add_table_compact_style(root: ET.Element) -> None:
-    """Paragraph style for table cells: single-spaced, same font size as Normal."""
+    """Paragraph style for table cells: 10 pt, compact spacing."""
     style = ET.SubElement(root, _w("style"))
     style.set(_w("type"), "paragraph")
     style.set(_w("customStyle"), "1")
@@ -90,6 +99,7 @@ def _add_table_compact_style(root: ET.Element) -> None:
     rpr = ET.SubElement(style, _w("rPr"))
     _set_fonts(rpr)
     _set_black(rpr)
+    _set_font_size(rpr, TABLE_FONT_SIZE)
 
 
 def _patch_styles(styles_xml: bytes) -> bytes:
