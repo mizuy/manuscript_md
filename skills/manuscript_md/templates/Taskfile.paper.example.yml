@@ -1,0 +1,25 @@
+# Research-repo include snippet (go-task flatten).
+#
+# Constraints — see docs/WORKFLOW.md#consumer-includes:
+# - taskfile/dir: ${PAPER_PROJECT:-…} only (no {{.VAR}} in those fields)
+# - PAPER_DIR / PAPER_CSL / FILES: literals here (not {{.PAPER_CSL}})
+# - includes.vars often beat CLI FILES=…; edit literals to change defaults
+# - TASKFILE_DIR inside includes.vars = manuscript_md clone, not this repo
+#
+# Set PAPER_PROJECT to your manuscript_md clone (absolute or relative).
+
+version: "3"
+
+vars:
+  PAPER_PROJECT: '{{.PAPER_PROJECT | default "../manuscript_md"}}'
+
+includes:
+  manuscript_md:
+    taskfile: ${PAPER_PROJECT:-../manuscript_md}/Taskfile.yml
+    dir: ${PAPER_PROJECT:-../manuscript_md}
+    flatten: true
+    vars:
+      PAPER_DIR: /absolute/path/to/paper
+      PAPER_CSL: vancouver.csl
+      FILES: manuscript supplementary
+      PAPERPILE_BIB: /absolute/path/to/paperpile.bib

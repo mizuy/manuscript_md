@@ -1,7 +1,7 @@
 -- Improve pandoc pipe tables for Word (docx):
 -- 1. Convert <br> in cells to LineBreak (Table 1 column headers).
 -- 2. Replace break-prone spaces in table cells (e.g. "2.0 (0.5–10.0)").
--- 3. Assign slightly wider columns to row labels on wide tables.
+-- 3. Assign wider columns to label and trailing fields on wide tables.
 -- Spacing / alignment: patch_docx_tables.py (see TABLE_WORD.md).
 
 local NBSP = utf8.char(0x00A0)
@@ -90,6 +90,7 @@ local function column_weights(n)
     weights[i] = 1.0
   end
   weights[1] = 1.25
+  weights[n] = 2.1
   if n >= 7 then
     weights[3] = 1.15
     if n >= 8 then

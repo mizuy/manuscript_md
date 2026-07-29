@@ -2,14 +2,26 @@
 
 Run this checklist before `task paper:docx` and journal submission.
 
-Supplementary policy: [`SUPPLEMENTARY_POLICY.md`](SUPPLEMENTARY_POLICY.md).
+- Workflow: [`WORKFLOW.md`](WORKFLOW.md)
+- Prose / figures: [`PROSE_CONVENTIONS.md`](PROSE_CONVENTIONS.md)
+- Supplementary policy: [`SUPPLEMENTARY_POLICY.md`](SUPPLEMENTARY_POLICY.md)
 
 ## Manuscript
 
 - [ ] Abstract / Discussion / Conclusions aligned (no orphan claims)
-- [ ] No `**bold**` or inline `` `code` `` in body text (see project `manuscript_instruction.md` when present)
-- [ ] `references.bib` regenerated from `[@key]` (`--scan-markdown`)
+- [ ] No `**bold**` or inline `` `code` `` in body text ([`PROSE_CONVENTIONS.md`](PROSE_CONVENTIONS.md); Abstract labels + Figure/Table lead-ins excepted)
+- [ ] No analysis column names, task names, or `table_*.csv` / `fig_*.png` filenames in Methods/Results
+- [ ] R package names only in Software (not Methods narrative)
+- [ ] `references.bib` regenerated from `[@key]` (`--scan-markdown`; skill **manuscript-reference**)
 - [ ] Every main-text Table/Figure cited before or at first use
+- [ ] Project `comment.md` / `manuscript_instruction.md` claim boundaries respected
+
+## Figures / tables
+
+- [ ] Manuscript `fig/` images have no embedded title/subtitle
+- [ ] Captions use `**Figure N.**` / `**Table N.**` lead-in only
+- [ ] `table/` CSV companions updated; `@import` targets exist
+- [ ] `task paper:fig-audit` (or equivalent) passes when syncing from analysis tasks
 
 ## Supplementary (`supplementary.md`)
 
@@ -25,23 +37,21 @@ Supplementary policy: [`SUPPLEMENTARY_POLICY.md`](SUPPLEMENTARY_POLICY.md).
 
 ## Build
 
-- [ ] `task paper:docx` (or `lab-paper` equivalent) succeeds
-- [ ] `task paper:fig-audit` passes if figures are synced from analysis tasks
+- [ ] `task paper:docx` (or `lab-paper` equivalent) succeeds for review drafts
+- [ ] `task paper:submission` (or equivalent) for final upload: figure-free docx + TIFF @ 600 dpi
+- [ ] Word cycle (`paper:tag` / `paper:diff`) uses paths under the paper directory (not `/tmp`)
 
 ## Grep aids
 
 Run from the paper directory (e.g. `docs/paper_lag0/`):
 
 ```bash
-# Internal / additional references must be absent from submission files
 rg -i 'additional supplementary|additional\.md|additional online' manuscript.md supplementary.md
-
-# List Supplementary items defined in supplementary.md
+rg '\*\*' manuscript.md
+rg '`' manuscript.md
 rg '\*\*Supplementary (Table|Figure) [0-9]+' supplementary.md
-
-# Cross-check each appears in manuscript (example for Figure 3)
-rg 'Supplementary Figure 3' manuscript.md
-rg 'Supplementary Table 2' manuscript.md
+rg 'Supplementary (Table|Figure) [0-9]+' manuscript.md
 ```
 
-Project-specific prose rules (cohort naming, claim boundaries): see `docs/paper_<name>/manuscript_instruction.md` when present.
+Project-specific prose rules (cohort naming, claim boundaries): see
+`manuscript_instruction.md` / `comment.md` in the paper directory.

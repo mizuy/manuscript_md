@@ -1,46 +1,42 @@
 # manuscript_md
 
-Shared Markdown-to-Word paper-building tooling for lab projects.
+Public **Cursor Agent Skills** + tooling for Markdown scientific papers → Word.
 
-**Project name:** manuscript_md  
-**Directory on disk:** `/Users/mizuy/lab/paper` (folder not renamed yet to avoid breaking paths)  
-**CLI package:** `lab-paper` (unchanged)  
-**Cursor skill:** `manuscript_md` — canonical at [`cursor-skill/manuscript_md/SKILL.md`](cursor-skill/manuscript_md/SKILL.md)
+**GitHub:** https://github.com/mizuy/manuscript_md  
+**Install:** [`docs/INSTALL.md`](docs/INSTALL.md)  
+**CLI:** `lab-paper` (`uv sync` in this repo)
 
-> The GitHub remote may be renamed to `manuscript_md` later. Until then, clone path stays `lab/paper`.
+| Skill | Path |
+|-------|------|
+| manuscript_md | [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) |
+| manuscript-reference | [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) |
+| word-docx-compare | [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) |
 
-This project owns the reusable Markdown-to-Word workflow:
+```bash
+git clone https://github.com/mizuy/manuscript_md.git
+cd manuscript_md && uv sync
+export PAPERPILE_BIB=/path/to/paperpile.bib
+task paper:docx PAPER_DIR=/path/to/paper
+```
 
-- build `references.bib` from manuscript citations and `paperpile.bib`
-- expand `@import "table/foo_csv.md"` fragments before pandoc
-- resolve bundled or paper-local CSL files
-- run pandoc with reusable Lua filters
-- patch generated docx tables for Word layout
-- count manuscript words
-- sync reusable Lua filters into a paper directory
+Skills ship scripts/filters/csl under `skills/`. Papers stay minimal (no vendored
+build assets). Research repos flatten-include this `Taskfile.yml` (see
+[`docs/INSTALL.md`](docs/INSTALL.md)).
 
-External instructions and editor integrations should point users and agents to this project rather than duplicating the build scripts.
-
-## Workspace Usage
-
-Add this folder to the same VS Code/Cursor workspace as the research repository.
-
-Example workspace:
+## Workspace
 
 ```json
 {
   "folders": [
     { "path": "/path/to/research-repo" },
-    { "path": "/Users/mizuy/lab/paper" }
+    { "path": "/path/to/manuscript_md" }
   ]
 }
 ```
 
-Run tasks from this project and pass the target paper directory with `PAPER_DIR`.
-
 ```bash
-cd /Users/mizuy/lab/paper
-task paper:docx PAPER_DIR=/path/to/research-repo/paper
+cd /path/to/manuscript_md
+task paper:docx PAPER_DIR=/path/to/research-repo/paper PAPERPILE_BIB=/path/to/paperpile.bib
 task paper:words PAPER_DIR=/path/to/research-repo/paper
 ```
 
@@ -55,26 +51,31 @@ task paper:docx \
 
 ## Tasks
 
-- `task paper:docx PAPER_DIR=/path/to/paper`: build Word docx files.
+- `task paper:docx PAPER_DIR=/path/to/paper`: build Word docx (skill filters, no copy).
 - `task paper:words PAPER_DIR=/path/to/paper`: count abstract and main-text words.
 - `task paper:build-bib PAPER_DIR=/path/to/paper`: generate `references.bib`.
-- `task paper:sync-assets PAPER_DIR=/path/to/paper`: copy Lua filters if missing.
-- `task paper:sync-assets PAPER_DIR=/path/to/paper OVERWRITE=1`: overwrite existing copied filters from this project.
+- `task paper:checkme PAPER_DIR=/path/to/paper`: citation dashboard (`checkme_paper.md`).
+- `task paper:submission PAPER_DIR=/path/to/paper`: upload package + TIFF.
+- `task paper:sync-assets PAPER_DIR=/path/to/paper`: **optional** copy of filters for paper-local overrides.
+
+New paper recipe: [`docs/NEW_PAPER.md`](docs/NEW_PAPER.md).  
+Consumer includes rules: [`docs/WORKFLOW.md`](docs/WORKFLOW.md#consumer-includes).
 
 ## Paper Directory Expectations
 
-A target paper directory should contain:
+Minimal paper directory:
 
 ```text
 paper/
   manuscript.md
   supplementary.md
-  reference.docx
-  script/filters/*.lua
-  references.bib
+  # reference.docx optional override — default: skill templates/reference.docx
+  fig/  table/
+  references.bib          # generated
 ```
 
-`paper:sync-assets` can create or update `script/filters`.
+Lua filters, CSL, and `reference.docx` ship inside `skills/manuscript_md/`.
+Do not require paper-local copies unless overriding.
 
 Research repositories remain responsible for analysis outputs and project-specific artifact syncing, such as copying tables and figures into `paper/table` or `paper/fig`.
 
@@ -103,10 +104,16 @@ uv run lab-paper sync-assets --paper-dir /path/to/paper
 
 | Doc | Content |
 |-----|---------|
+| [`docs/INSTALL.md`](docs/INSTALL.md) | Public install (clone / symlink / project skills) |
+| [`docs/NEW_PAPER.md`](docs/NEW_PAPER.md) | Bootstrap a new paper |
+| [`docs/WORKFLOW.md`](docs/WORKFLOW.md) | End-to-end loop + Task includes rules |
+| [`docs/PROSE_CONVENTIONS.md`](docs/PROSE_CONVENTIONS.md) | Body prose + figure caption rules |
 | [`docs/PAPER_LAYOUT.md`](docs/PAPER_LAYOUT.md) | Directory layout |
 | [`docs/reference.md`](docs/reference.md) | pandoc, Taskfile, Lua |
-| [`docs/REFERENCE_INGEST.md`](docs/REFERENCE_INGEST.md) | Literature ingest |
+| [`docs/REFERENCE_INGEST.md`](docs/REFERENCE_INGEST.md) | Literature ingest (Paperpile) |
 | [`docs/SUPPLEMENTARY_POLICY.md`](docs/SUPPLEMENTARY_POLICY.md) | Supplement rules |
 | [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | Final checklist |
 | [`docs/TABLE_WORD.md`](docs/TABLE_WORD.md) | Word table layout |
-| [`cursor-skill/manuscript_md/SKILL.md`](cursor-skill/manuscript_md/SKILL.md) | Cursor agent skill |
+| [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) | Cursor skill + scripts/filters/csl |
+| [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) | Cursor skill + bib / checkme |
+| [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) | Cursor skill + Compare scripts |

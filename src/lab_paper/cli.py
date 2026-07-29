@@ -8,22 +8,25 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT_DIR = PROJECT_ROOT / "scripts"
+SKILL_MD = PROJECT_ROOT / "skills" / "manuscript_md"
+SKILL_REF = PROJECT_ROOT / "skills" / "manuscript-reference"
 
 
-SCRIPT_COMMANDS: dict[str, str] = {
-    "build-bib": "build_bibliography.py",
-    "expand-imports": "expand_imports.py",
-    "patch-docx": "patch_docx_tables.py",
-    "reference-docx": "build_reference_docx.py",
-    "resolve-csl": "resolve_csl.py",
-    "word-count": "word_count.py",
-    "ingest-reference": "ingest_reference.py",
+SCRIPT_COMMANDS: dict[str, Path] = {
+    "build-bib": SKILL_REF / "scripts" / "build_bibliography.py",
+    "expand-imports": SKILL_MD / "scripts" / "expand_imports.py",
+    "export-figures": SKILL_MD / "scripts" / "export_submission_figures.py",
+    "patch-docx": SKILL_MD / "scripts" / "patch_docx_tables.py",
+    "reference-docx": SKILL_MD / "scripts" / "build_reference_docx.py",
+    "resolve-csl": SKILL_MD / "scripts" / "resolve_csl.py",
+    "resolve-reference-doc": SKILL_MD / "scripts" / "resolve_reference_doc.py",
+    "word-count": SKILL_MD / "scripts" / "word_count.py",
+    "ingest-reference": SKILL_REF / "scripts" / "ingest_reference.py",
+    "checkme": SKILL_REF / "scripts" / "checkme_dashboard.py",
 }
 
 
-def _run_script(script_name: str, args: list[str]) -> int:
-    script = SCRIPT_DIR / script_name
+def _run_script(script: Path, args: list[str]) -> int:
     if not script.is_file():
         print(f"script not found: {script}", file=sys.stderr)
         return 1
@@ -50,7 +53,11 @@ def _copytree_contents(src: Path, dst: Path, *, overwrite: bool) -> list[Path]:
 def sync_assets(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="lab-paper sync-assets",
-        description="Sync reusable paper build assets into a paper directory.",
+        description=(
+            "Optional: copy Lua filters into PAPER_DIR/script/filters for "
+            "paper-local overrides. Default docx build uses skill filters "
+            "directly (no copy)."
+        ),
     )
     parser.add_argument("--paper-dir", type=Path, required=True, help="Target paper directory")
     parser.add_argument(
@@ -68,19 +75,30 @@ def sync_assets(argv: list[str]) -> int:
         action="store_true",
         help="Also copy bundled templates into PAPER_DIR/templates",
     )
+    parser.add_argument(
+        "--include-reference-doc",
+        action="store_true",
+        help="Also copy skill templates/reference.docx into PAPER_DIR/",
+    )
     args = parser.parse_args(argv)
 
     paper_dir = args.paper_dir.expanduser().resolve()
     paper_dir.mkdir(parents=True, exist_ok=True)
 
-    mappings = [(PROJECT_ROOT / "filters", paper_dir / "script" / "filters")]
+    mappings = [(SKILL_MD / "filters", paper_dir / "script" / "filters")]
     if args.include_csl:
-        mappings.append((PROJECT_ROOT / "csl", paper_dir / "csl"))
+        mappings.append((SKILL_MD / "csl", paper_dir / "csl"))
     if args.include_templates:
-        mappings.append((PROJECT_ROOT / "templates", paper_dir / "templates"))
+        mappings.append((SKILL_MD / "templates", paper_dir / "templates"))
     written: list[Path] = []
     for src, dst in mappings:
         written.extend(_copytree_contents(src, dst, overwrite=args.overwrite))
+    if args.include_reference_doc:
+        src = SKILL_MD / "templates" / "reference.docx"
+        dst = paper_dir / "reference.docx"
+        if src.is_file() and (args.overwrite or not dst.exists()):
+            shutil.copy2(src, dst)
+            written.append(dst)
 
     for path in written:
         print(path)

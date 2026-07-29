@@ -34,5 +34,5 @@ The manuscript Supplementary appendix should list only what is in `supplementary
 ## Related
 
 - Final checklist: [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md)
-- Cursor skill: [`cursor-skill/manuscript_md/SKILL.md`](../cursor-skill/manuscript_md/SKILL.md)
+- Cursor skill: [`skills/manuscript_md/SKILL.md`](../skills/manuscript_md/SKILL.md)
 - Template: [`templates/supplementary_skeleton.md`](../templates/supplementary_skeleton.md)

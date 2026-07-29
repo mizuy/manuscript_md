@@ -1,18 +1,22 @@
 version: "3"
 
+# Consumable via research-repo includes (flatten: true). See Taskfile.paper.example.yml.
+
 vars:
-  PYTHON: uv run python
-  PAPER_DIR: '{{.PAPER_DIR | default ""}}'
-  PAPERPILE_BIB: '{{.PAPERPILE_BIB | default "/Users/mizuy/lab/vault/paperpile.bib"}}'
+  PYTHON: '{{.PYTHON | default "uv run python"}}'
+  # Overridable via includes.vars / CLI (must use default — included vars win otherwise)
+  PAPER_CSL: '{{.PAPER_CSL | default "vancouver.csl"}}'
+  FILES: '{{.FILES | default "manuscript"}}'
+  PAPERPILE_BIB: '{{.PAPERPILE_BIB | default ""}}'
   PANDOC: '{{.PANDOC | default "pandoc"}}'
   PANDOC_FLAGS: '{{.PANDOC_FLAGS | default ""}}'
-  PAPER_CSL: '{{.PAPER_CSL | default "vancouver.csl"}}'
   PAPER_PANDOC_FROM: '{{.PAPER_PANDOC_FROM | default "markdown+lists_without_preceding_blankline+fenced_divs"}}'
   PAPER_REFERENCE_DOC: '{{.PAPER_REFERENCE_DOC | default "reference.docx"}}'
-  FILES: '{{.FILES | default "manuscript"}}'
   OVERWRITE: '{{.OVERWRITE | default "0"}}'
-  CSL_PATH:
-    sh: 'test -n "{{.PAPER_DIR}}" && uv run lab-paper resolve-csl "{{.PAPER_CSL}}" --paper-dir "{{.PAPER_DIR}}"'
+  SKILL_MD: '{{.TASKFILE_DIR}}/skills/manuscript_md'
+  SKILL_REF: '{{.TASKFILE_DIR}}/skills/manuscript-reference'
+  SKILL_COMPARE: '{{.TASKFILE_DIR}}/skills/word-docx-compare'
+  FILTERS: '{{.SKILL_MD}}/filters'
 
 tasks:
   paper:check-dir:
@@ -20,67 +24,199 @@ tasks:
     cmds:
       - >-
         test -n "{{.PAPER_DIR}}" ||
-        (echo "PAPER_DIR is required, e.g. task paper:docx PAPER_DIR=/path/to/research-repo/paper" >&2; exit 2)
+        (echo "PAPER_DIR is required, e.g. task paper:docx PAPER_DIR=/path/to/paper" >&2; exit 2)
       - >-
         test -d "{{.PAPER_DIR}}" ||
         (echo "PAPER_DIR does not exist: {{.PAPER_DIR}}" >&2; exit 2)
 
   paper:sync-assets:
-    desc: Sync reusable Lua filters into PAPER_DIR
-    deps:
-      - paper:check-dir
+    desc: 'Optional — copy filters into PAPER_DIR for local overrides'
+    deps: [paper:check-dir]
     cmds:
       - uv run lab-paper sync-assets --paper-dir "{{.PAPER_DIR}}" {{if eq .OVERWRITE "1"}}--overwrite{{end}}
 
   paper:build-bib:
     desc: Build references.bib from manuscript citations and paperpile.bib
-    deps:
-      - paper:check-dir
+    deps: [paper:check-dir]
     cmds:
       - >-
         PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper build-bib
-        --paper-dir "{{.PAPER_DIR}}"
-        --scan-markdown
+        --paper-dir "{{.PAPER_DIR}}" --scan-markdown
         --paperpile-bib "{{.PAPERPILE_BIB}}"
         -o "{{.PAPER_DIR}}/references.bib"
 
-  paper:docx:
-    desc: Build PAPER_DIR/*.md to docx with citeproc and Word table patching
-    deps:
-      - paper:check-dir
+  paper:ingest-reference:
+    desc: Sync reference/ md metadata + README ## 一覧
+    deps: [paper:check-dir]
     cmds:
-      - task: paper:sync-assets
-        vars:
-          PAPER_DIR: "{{.PAPER_DIR}}"
+      - >-
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper ingest-reference
+        --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
+
+  paper:checkme:
+    desc: Update checkme_paper.md citation dashboard (auto section)
+    deps: [paper:check-dir]
+    cmds:
+      - >-
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper checkme
+        --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
+
+  paper:docx:
+    desc: Build PAPER_DIR/*.md → docx (skill filters + reference.docx)
+    deps: [paper:check-dir]
+    vars:
+      CSL_PATH:
+        sh: >-
+          uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+          --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
+      REFERENCE_DOC_PATH:
+        sh: >-
+          uv run lab-paper resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
+          --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
+    cmds:
       - task: paper:build-bib
-        vars:
-          PAPER_DIR: "{{.PAPER_DIR}}"
-          PAPERPILE_BIB: "{{.PAPERPILE_BIB}}"
+        vars: { PAPER_DIR: "{{.PAPER_DIR}}", PAPERPILE_BIB: "{{.PAPERPILE_BIB}}" }
       - for: { var: FILES }
         cmd: >-
           uv run lab-paper expand-imports
-          "{{.PAPER_DIR}}/{{.ITEM}}.md"
-          -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
+          "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
           && cd "{{.PAPER_DIR}}"
           && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
-          --lua-filter=script/filters/pagebreak.lua
-          --lua-filter=script/filters/landscape.lua
-          --lua-filter=script/filters/table_word.lua
-          --lua-filter=script/filters/superscript.lua
-          --reference-doc="{{.PAPER_REFERENCE_DOC}}"
+          --lua-filter="{{.FILTERS}}/pagebreak.lua"
+          --lua-filter="{{.FILTERS}}/landscape.lua"
+          --lua-filter="{{.FILTERS}}/table_word.lua"
+          --lua-filter="{{.FILTERS}}/superscript.lua"
+          --reference-doc="{{.REFERENCE_DOC_PATH}}"
           --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
           ".build/{{.ITEM}}.md" -o "{{.ITEM}}.docx"
           && cd "{{.TASKFILE_DIR}}"
           && uv run lab-paper patch-docx "{{.PAPER_DIR}}/{{.ITEM}}.docx"
 
   paper:words:
-    desc: Count abstract and main-text words in PAPER_DIR/manuscript.md
-    deps:
-      - paper:check-dir
+    desc: Count abstract and main-text words in manuscript.md
+    deps: [paper:check-dir]
     cmds:
       - uv run lab-paper word-count --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
+
+  paper:submission:
+    desc: Submission package (docx ± figures + TIFF @ DPI)
+    deps: [paper:check-dir]
+    vars:
+      DPI: '{{.DPI | default "600"}}'
+      OUT_DIR: '{{.OUT_DIR | default ""}}'
+      CSL_PATH:
+        sh: >-
+          uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+          --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
+      REFERENCE_DOC_PATH:
+        sh: >-
+          uv run lab-paper resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
+          --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
+      SUBMISSION_DIR:
+        sh: >-
+          if [ -n "{{.OUT_DIR}}" ]; then printf '%s' "{{.OUT_DIR}}";
+          else printf '%s' "{{.PAPER_DIR}}/submission"; fi
+    cmds:
+      - task: paper:build-bib
+        vars: { PAPER_DIR: "{{.PAPER_DIR}}", PAPERPILE_BIB: "{{.PAPERPILE_BIB}}" }
+      - mkdir -p "{{.SUBMISSION_DIR}}/figures"
+      - for: { var: FILES }
+        cmd: >-
+          uv run lab-paper expand-imports
+          "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
+          && cd "{{.PAPER_DIR}}"
+          && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
+          --lua-filter="{{.FILTERS}}/pagebreak.lua"
+          --lua-filter="{{.FILTERS}}/landscape.lua"
+          --lua-filter="{{.FILTERS}}/table_word.lua"
+          --lua-filter="{{.FILTERS}}/superscript.lua"
+          --lua-filter="{{.FILTERS}}/omit_images.lua"
+          --reference-doc="{{.REFERENCE_DOC_PATH}}"
+          --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
+          ".build/{{.ITEM}}.md" -o "{{.SUBMISSION_DIR}}/{{.ITEM}}.docx"
+          && cd "{{.TASKFILE_DIR}}"
+          && uv run lab-paper patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}.docx"
+      - for: { var: FILES }
+        cmd: >-
+          uv run lab-paper expand-imports
+          "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
+          && cd "{{.PAPER_DIR}}"
+          && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
+          --lua-filter="{{.FILTERS}}/pagebreak.lua"
+          --lua-filter="{{.FILTERS}}/landscape.lua"
+          --lua-filter="{{.FILTERS}}/table_word.lua"
+          --lua-filter="{{.FILTERS}}/superscript.lua"
+          --reference-doc="{{.REFERENCE_DOC_PATH}}"
+          --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
+          ".build/{{.ITEM}}.md" -o "{{.SUBMISSION_DIR}}/{{.ITEM}}_with_figures.docx"
+          && cd "{{.TASKFILE_DIR}}"
+          && uv run lab-paper patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}_with_figures.docx"
+      - >-
+        uv run lab-paper export-figures
+        --paper-dir "{{.PAPER_DIR}}" --files "{{.FILES}}"
+        --out-dir "{{.SUBMISSION_DIR}}/figures" --dpi "{{.DPI}}"
+      - 'echo "Submission package: {{.SUBMISSION_DIR}}"'
 
   paper:csl:
     desc: Resolve or list bundled CSL files
     cmds:
-      - uv run lab-paper resolve-csl "{{.PAPER_CSL}}" --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
+      - >-
+        uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+        --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}" {{.CLI_ARGS}}
+
+  # --- word-docx-compare ---
+
+  paper:compare:
+    desc: Word Compare two docx files (macOS; paths under PAPER_DIR)
+    deps: [paper:check-dir]
+    vars:
+      BASE: '{{.BASE | default ""}}'
+      CHANGED: '{{.CHANGED | default ""}}'
+      OUTPUT: '{{.OUTPUT | default ""}}'
+    cmds:
+      - |
+        if [ -z "{{.BASE}}" ] || [ -z "{{.CHANGED}}" ]; then
+          echo "Usage: task paper:compare BASE=old.docx CHANGED=new.docx [OUTPUT=versions/diff.docx]" >&2
+          exit 1
+        fi
+        cd "{{.PAPER_DIR}}"
+        chmod +x "{{.SKILL_COMPARE}}/scripts/compare_docx.sh"
+        "{{.SKILL_COMPARE}}/scripts/compare_docx.sh" "{{.BASE}}" "{{.CHANGED}}" "{{.OUTPUT}}"
+
+  paper:tag:
+    desc: Tag manuscript.docx as versions/v{N} and diff vs manifest base
+    deps: [paper:check-dir]
+    vars:
+      VERSION: '{{.VERSION | default ""}}'
+      SOURCE: '{{.SOURCE | default "manuscript.docx"}}'
+      VERSION_PREFIX: '{{.VERSION_PREFIX | default "ADR_manuscript"}}'
+    cmds:
+      - |
+        if [ -z "{{.VERSION}}" ]; then
+          echo "Usage: task paper:tag VERSION=5 [SOURCE=manuscript.docx]" >&2
+          exit 1
+        fi
+        chmod +x "{{.SKILL_COMPARE}}/scripts/tag_version.sh"
+        PAPER_DIR="{{.PAPER_DIR}}" PAPER_PROJECT="{{.TASKFILE_DIR}}" \
+          VERSION_PREFIX="{{.VERSION_PREFIX}}" PYTHON="{{.PYTHON}}" \
+          "{{.SKILL_COMPARE}}/scripts/tag_version.sh" "{{.VERSION}}" "{{.SOURCE}}"
+
+  paper:diff:
+    desc: Regenerate Word Compare diff from versions/manifest.yml
+    deps: [paper:check-dir]
+    vars:
+      ENTRY: '{{.ENTRY | default ""}}'
+      MANIFEST: '{{.MANIFEST | default "manifest.yml"}}'
+    cmds:
+      - |
+        chmod +x "{{.SKILL_COMPARE}}/scripts/diff_version.sh"
+        PAPER_DIR="{{.PAPER_DIR}}" PAPER_PROJECT="{{.TASKFILE_DIR}}" \
+          MANIFEST="{{.MANIFEST}}" PYTHON="{{.PYTHON}}" \
+          "{{.SKILL_COMPARE}}/scripts/diff_version.sh" "{{.ENTRY}}"
+
+  paper:versions:
+    desc: List/validate versions/manifest.yml
+    deps: [paper:check-dir]
+    cmds:
+      - '{{.PYTHON}} {{.TASKFILE_DIR}}/scripts/version_manifest.py list --paper-dir "{{.PAPER_DIR}}"'
+      - '{{.PYTHON}} {{.TASKFILE_DIR}}/scripts/version_manifest.py validate --paper-dir "{{.PAPER_DIR}}"'

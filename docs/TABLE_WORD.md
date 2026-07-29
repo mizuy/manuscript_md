@@ -41,9 +41,12 @@ The import expansion and Markdown rendering convert these leading spaces to em s
 
 ## Column Widths
 
-`filters/table_word.lua` keeps data columns mostly even and gives the first label column slightly more width. The last column is not widened by default.
+`filters/table_word.lua` (under `skills/manuscript_md/filters/`) keeps
+data columns mostly even, gives the first label column slightly more width, and
+widens the last column for trailing fields (notes / p-values).
 
-If a paper needs custom widths, copy `filters/table_word.lua` into the paper directory with `task paper:sync-assets`, then edit the paper-local copy under `script/filters/`.
+Default builds use the skill filters directly. To customize one paper only, copy
+with `task paper:sync-assets` and edit `PAPER_DIR/script/filters/`.
 
 ## Alignment
 

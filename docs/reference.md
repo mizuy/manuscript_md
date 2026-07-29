@@ -1,87 +1,55 @@
 # manuscript_md Reference
 
-**manuscript_md** (`lab-paper` CLI) builds a Markdown paper directory into Word docx output.
+**manuscript_md** (`lab-paper` CLI) builds a Markdown paper directory into Word docx.
 
 ## Paths
 
 | Item | Path |
 |------|------|
-| Project root (manuscript_md) | `/Users/mizuy/lab/paper` |
-| Cursor skill | `cursor-skill/manuscript_md/SKILL.md` |
-| Supplementary policy | `docs/SUPPLEMENTARY_POLICY.md` |
-| Submission checklist | `docs/SUBMISSION_CHECKLIST.md` |
-| Bundled Lua filters | `/Users/mizuy/lab/paper/filters/*.lua` |
-| Bundled CSL files | `/Users/mizuy/lab/paper/csl/*.csl` |
-| Bundled templates | `/Users/mizuy/lab/paper/templates/` |
+| Project root | `/Users/mizuy/lab/manuscript_md` |
+| Skill (scripts/filters/csl) | `skills/manuscript_md/` |
+| Companion skills | `skills/manuscript-reference/`, `skills/word-docx-compare/` |
+| Docs | `docs/` |
 
-The target paper directory is passed with `PAPER_DIR`.
+Compat symlinks: repo-root `filters/` → skill `filters/`, `csl/` → skill `csl/`.
 
 ## Common Tasks
 
 ```bash
-cd /Users/mizuy/lab/paper
+cd /Users/mizuy/lab/manuscript_md
 task paper:docx PAPER_DIR=/path/to/paper
 task paper:words PAPER_DIR=/path/to/paper
 task paper:build-bib PAPER_DIR=/path/to/paper
+task paper:submission PAPER_DIR=/path/to/paper
+# optional override only:
 task paper:sync-assets PAPER_DIR=/path/to/paper
 ```
 
-## Paper Directory
-
-A target paper directory usually contains:
+## Paper Directory (minimal)
 
 ```text
 paper/
   manuscript.md
   supplementary.md
-  reference.docx
-  vancouver.csl
-  references.bib
+  references.bib      # generated
   fig/
   table/
-  script/filters/
-  reference/
+  reference/          # optional
 ```
 
-`supplementary.md` is optional. `references.bib` and `.build/*.md` are generated.
+Do not require `script/filters/` or `reference.docx` — pandoc uses skill
+filters / `templates/reference.docx` by absolute path (paper-local file wins
+if present).
 
-## Bibliography
+## Bibliography / Imports / CSL
 
-`references.bib` is generated from citation keys in Markdown, such as `[@Example2024-aa]`.
-
-```bash
-cd /Users/mizuy/lab/paper
-task paper:build-bib PAPER_DIR=/path/to/paper
-```
-
-Set `PAPERPILE_BIB=/path/to/paperpile.bib` if the default Paperpile export is not available.
-
-## Imports
-
-`@import "relative/path.md"` is expanded before pandoc. Paths are resolved relative to the Markdown file containing the import.
-
-This is mainly used for generated table fragments:
-
-```markdown
-@import "table/table_1_csv.md"
-```
-
-## CSL
-
-Use `PAPER_CSL` to choose a bundled CSL file, a paper-local file, or an absolute path.
-
-```bash
-task paper:docx PAPER_DIR=/path/to/paper PAPER_CSL=vancouver.csl
-task paper:docx PAPER_DIR=/path/to/paper PAPER_CSL=/path/to/custom.csl
-```
+Same as before: `[@key]`, `@import`, `PAPER_CSL=<bundled-name|path>`.
 
 ## Manual Pandoc Flow
 
-The task wraps this flow:
+Prefer `task paper:docx`. Internally:
 
 1. Build `references.bib`.
 2. Expand `@import` into `.build/<stem>.md`.
-3. Run pandoc with `script/filters/*.lua`, `reference.docx`, citeproc, and CSL.
+3. Run pandoc with **skill** `filters/*.lua`, `reference.docx`, citeproc, CSL.
 4. Patch docx table layout.
-
-Prefer `task paper:docx` for normal use.

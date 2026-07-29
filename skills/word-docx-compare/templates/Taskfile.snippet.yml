@@ -1,0 +1,28 @@
+# Prefer flatten-including manuscript_md/Taskfile.yml (has paper:compare / tag / diff / versions).
+# See skills/manuscript_md/templates/Taskfile.paper.example.yml
+#
+# Legacy snippet (only if you cannot include the full manuscript_md Taskfile):
+
+  paper:compare:
+    desc: '2 docx を Word Compare（macOS）'
+    vars:
+      PAPER_PROJECT: '{{.PAPER_PROJECT | default "/Users/mizuy/lab/manuscript_md"}}'
+      WORD_COMPARE_SKILL: '{{.WORD_COMPARE_SKILL | default (joinPath .PAPER_PROJECT "skills/word-docx-compare")}}'
+      PAPER_DIR: '{{.PAPER_DIR | default "docs/paper_lag0"}}'
+    cmds:
+      - |
+        cd "{{.PAPER_DIR}}"
+        chmod +x "{{.WORD_COMPARE_SKILL}}/scripts/compare_docx.sh"
+        "{{.WORD_COMPARE_SKILL}}/scripts/compare_docx.sh" "{{.BASE}}" "{{.CHANGED}}" "{{.OUTPUT}}"
+
+  paper:tag:
+    desc: 'versions/v{N} + diff'
+    vars:
+      PAPER_PROJECT: '{{.PAPER_PROJECT | default "/Users/mizuy/lab/manuscript_md"}}'
+      WORD_COMPARE_SKILL: '{{.WORD_COMPARE_SKILL | default (joinPath .PAPER_PROJECT "skills/word-docx-compare")}}'
+      PAPER_DIR: '{{.PAPER_DIR | default "docs/paper_lag0"}}'
+    cmds:
+      - |
+        chmod +x "{{.WORD_COMPARE_SKILL}}/scripts/tag_version.sh"
+        PAPER_DIR="$(cd "{{.PAPER_DIR}}" && pwd)" PAPER_PROJECT="{{.PAPER_PROJECT}}" \
+          "{{.WORD_COMPARE_SKILL}}/scripts/tag_version.sh" "{{.VERSION}}" "{{.SOURCE | default "manuscript.docx"}}"

@@ -10,7 +10,7 @@ link-citations: true
 
 <!-- Operational definitions referenced by Supplementary Table/Figure captions.
      supplementary.md is submission-facing and self-contained.
-     See docs/SUPPLEMENTARY_POLICY.md in manuscript_md (lab/paper). -->
+     See docs/SUPPLEMENTARY_POLICY.md in manuscript_md (lab/manuscript_md). -->
 
 # Supplementary Tables
 

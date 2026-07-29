@@ -1,76 +1,54 @@
 # Paper Directory Layout
 
-This is the recommended layout for a Markdown paper directory built with **manuscript_md** (`lab-paper` CLI).
+Recommended **minimal** layout for a paper built with **manuscript_md** skills.
+Build tooling (Lua filters, CSL, Python scripts) lives in the skill packages —
+do **not** vendor them into the paper unless you need a local override.
 
 ```text
 paper/
   manuscript.md
   supplementary.md
-  references.bib
-  manual_entries.bib
-  reference.docx
-  vancouver.csl
+  manuscript_instruction.md  # project prose / claims
+  comment.md                 # scientific claims (not submitted)
+  checkme_paper.md           # optional citation dashboard
+  references.bib             # generated
+  manual_entries.bib         # optional
+  # reference.docx           # optional override; default = skill templates/
   fig/
-    README.md
   table/
-    table_1.csv
-    table_1_csv.md
-  script/
-    README.md
-    filters/
-      pagebreak.lua
-      landscape.lua
-      table_word.lua
-      superscript.lua
-  reference/
-    README.md
-    reference_keys.txt
-    reference.bib
-    md/
-    pdf/
+  reference/                 # optional literature notes
+    md/ pdf/ reference_keys.txt
+  versions/                  # Word Compare cycle
+    manifest.yml
+  submission/                # generated upload package
+  _internal_review_notes.md  # never cited from submission Markdown
 ```
 
-Only `manuscript.md`, source notes, project-specific scripts, and curated references are normally edited by hand.
+Optional override only:
 
-Generated files include:
-
-- `references.bib`
-- `.build/*.md`
-- `*_csv.md` table fragments
-- `manuscript.docx`
-- `supplementary.docx`
-
-## Tables
-
-Store numeric table outputs in `table/*.csv`.
-
-Markdown companion files such as `table_1_csv.md` should be mechanical conversions from CSV. Table titles, captions, abbreviations, and explanatory footnotes belong in the manuscript.
-
-## Figures
-
-Store manuscript figures in `fig/` and reference them from Markdown:
-
-```markdown
-![](fig/figure_1.png)
+```text
+paper/script/filters/*.lua   # if present, you opted into sync-assets
 ```
 
-Figure titles and explanations belong in the manuscript caption, not inside the image unless the target journal requires it.
+Default `task paper:docx` uses `skills/manuscript_md/filters/` directly.
 
-## Filters
+## Tables / figures
 
-Paper-local Lua filters live under `script/filters/`.
+See [`TABLE_WORD.md`](TABLE_WORD.md), [`PROSE_CONVENTIONS.md`](PROSE_CONVENTIONS.md),
+[`WORKFLOW.md`](WORKFLOW.md).
 
-Create or refresh them with:
+## Submission package (TIFF)
 
 ```bash
-cd /Users/mizuy/lab/paper
-task paper:sync-assets PAPER_DIR=/path/to/paper
+cd /Users/mizuy/lab/manuscript_md
+task paper:submission PAPER_DIR=/path/to/paper FILES="manuscript supplementary" DPI=600
 ```
 
-The paper-local copy may be edited when a manuscript needs custom table or page-layout behavior.
+## Filters (skill)
+
+Canonical Lua filters: `skills/manuscript_md/filters/`.  
+Optional copy into a paper: `task paper:sync-assets PAPER_DIR=...` (override workflow).
 
 ## References
 
-Reference notes are optional. If used, keep one Markdown note per citation key under `reference/md/` and one PDF per key under `reference/pdf/`.
-
-See `docs/REFERENCE_INGEST.md` for details.
+See [`REFERENCE_INGEST.md`](REFERENCE_INGEST.md) and skill **manuscript-reference**.
