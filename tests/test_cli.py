@@ -24,6 +24,7 @@ class CliTests(unittest.TestCase):
         output = stdout.getvalue()
         self.assertIn("usage: lab-paper <command> [args]", output)
         self.assertIn("  sync-assets", output)
+        self.assertIn("  vault-reference", output)
         self.assertIn("  word-count", output)
 
     def test_unknown_command_returns_usage_error(self) -> None:

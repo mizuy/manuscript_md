@@ -61,6 +61,16 @@ tasks:
         PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper checkme
         --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
 
+  reference:vault-ingest:
+    desc: Ingest one Paperpile reference into a central Markdown vault
+    cmds:
+      - >-
+        test -n "{{.VAULT_DIR}}" ||
+        (echo "VAULT_DIR is required, e.g. task reference:vault-ingest VAULT_DIR=/path/to/vault -- --key Example2024-aa" >&2; exit 2)
+      - >-
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper vault-reference
+        --vault-dir "{{.VAULT_DIR}}" {{.CLI_ARGS}}
+
   paper:docx:
     desc: Build PAPER_DIR/*.md → docx (skill filters + reference.docx)
     deps: [paper:check-dir]

@@ -6,6 +6,9 @@ Canonical deep doc for the **manuscript-reference** skill
 Keeps paper-specific literature notes, PDFs, and bibliography files in sync with
 **Paperpile** (`paperpile.bib`).
 
+For the central Markdown vault workflow that stores long-term literature notes
+outside a paper directory, see [`CENTRAL_REFERENCE_VAULT.md`](CENTRAL_REFERENCE_VAULT.md).
+
 ## Directory Layout
 
 ```text
@@ -125,5 +128,6 @@ exist.
 ## Related
 
 - Skill entry: [`skills/manuscript-reference/SKILL.md`](../skills/manuscript-reference/SKILL.md)
+- Central vault: [`CENTRAL_REFERENCE_VAULT.md`](CENTRAL_REFERENCE_VAULT.md)
 - Writing / docx: [`skills/manuscript_md/SKILL.md`](../skills/manuscript_md/SKILL.md)
 - End-to-end loop: [`WORKFLOW.md`](WORKFLOW.md)

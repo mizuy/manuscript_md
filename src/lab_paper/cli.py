@@ -22,6 +22,7 @@ SCRIPT_COMMANDS: dict[str, Path] = {
     "resolve-reference-doc": SKILL_MD / "scripts" / "resolve_reference_doc.py",
     "word-count": SKILL_MD / "scripts" / "word_count.py",
     "ingest-reference": SKILL_REF / "scripts" / "ingest_reference.py",
+    "vault-reference": SKILL_REF / "scripts" / "vault_reference.py",
     "checkme": SKILL_REF / "scripts" / "checkme_dashboard.py",
 }
 
