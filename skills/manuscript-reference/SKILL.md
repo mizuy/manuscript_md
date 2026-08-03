@@ -15,6 +15,7 @@ description: >-
 |----------|-----------------|
 | `[@pandoc-id]` → `references.bib` | Obsidian vault wiki summaries |
 | `reference/md` + PDF notes ingest | Markdown → docx → **manuscript_md** |
+| central Markdown vault reference ingest | PDF/metadata acquisition inside Paperpile |
 | `checkme_paper.md` dashboard | Word Compare → **word-docx-compare** |
 
 **Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md)
@@ -43,6 +44,7 @@ cd "$PAPER_PROJECT"
 task paper:build-bib PAPER_DIR=/path/to/paper
 task paper:ingest-reference PAPER_DIR=/path/to/paper
 task paper:checkme PAPER_DIR=/path/to/paper
+task reference:vault-ingest VAULT_DIR=/path/to/vault -- --key Example2024-aa --source-md /path/to/source.md
 ```
 
 Or: `uv run lab-paper build-bib|ingest-reference|checkme …`
@@ -60,3 +62,11 @@ paper/
 
 Do not vendor these scripts into the paper. Deep doc:
 [`docs/REFERENCE_INGEST.md`](../../docs/REFERENCE_INGEST.md).
+
+## Central vault
+
+Use `lab-paper vault-reference` when long-term literature notes belong in a
+Markdown vault rather than one paper directory. Paperpile remains the source for
+BibTeX metadata and PDF acquisition; the vault stores source Markdown,
+classification, and notes. Deep doc:
+[`docs/CENTRAL_REFERENCE_VAULT.md`](../../docs/CENTRAL_REFERENCE_VAULT.md).

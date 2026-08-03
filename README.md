@@ -57,6 +57,7 @@ task paper:docx \
 - `task paper:checkme PAPER_DIR=/path/to/paper`: citation dashboard (`checkme_paper.md`).
 - `task paper:submission PAPER_DIR=/path/to/paper`: upload package + TIFF.
 - `task paper:sync-assets PAPER_DIR=/path/to/paper`: **optional** copy of filters for paper-local overrides.
+- `task reference:vault-ingest VAULT_DIR=/path/to/vault -- --key KEY ...`: ingest one Paperpile reference into a central Markdown vault.
 
 New paper recipe: [`docs/NEW_PAPER.md`](docs/NEW_PAPER.md).  
 Consumer includes rules: [`docs/WORKFLOW.md`](docs/WORKFLOW.md#consumer-includes).
@@ -125,6 +126,7 @@ adding new cases.
 | [`docs/PAPER_LAYOUT.md`](docs/PAPER_LAYOUT.md) | Directory layout |
 | [`docs/reference.md`](docs/reference.md) | pandoc, Taskfile, Lua |
 | [`docs/REFERENCE_INGEST.md`](docs/REFERENCE_INGEST.md) | Literature ingest (Paperpile) |
+| [`docs/CENTRAL_REFERENCE_VAULT.md`](docs/CENTRAL_REFERENCE_VAULT.md) | Central Markdown vault reference ingest |
 | [`docs/SUPPLEMENTARY_POLICY.md`](docs/SUPPLEMENTARY_POLICY.md) | Supplement rules |
 | [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | Final checklist |
 | [`docs/TABLE_WORD.md`](docs/TABLE_WORD.md) | Word table layout |
