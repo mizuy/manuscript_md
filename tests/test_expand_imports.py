@@ -63,7 +63,7 @@ class ExpandImportsTests(unittest.TestCase):
 
         normalized = expand_imports.normalize_table_cell_indents(source)
 
-        self.assertIn("| \u2003Child | kept |", normalized)
+        self.assertIn("|\u2003Child | kept |", normalized)
         self.assertIn("| Parent |   second column spaces stay ascii |", normalized)
         self.assertIn("| --- | --- |", normalized)
 

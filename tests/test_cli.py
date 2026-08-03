@@ -77,8 +77,9 @@ class CliTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             self.assertTrue((paper_dir / "csl" / "vancouver.csl").is_file())
             self.assertTrue((paper_dir / "templates" / "manuscript_skeleton.md").is_file())
+            self.assertTrue((paper_dir / "reference.docx").is_file())
             self.assertTrue((paper_dir / "script" / "filters" / "table_word.lua").is_file())
-            self.assertNotIn(str(paper_dir / "reference.docx"), stdout.getvalue())
+            self.assertIn(str(paper_dir / "reference.docx"), stdout.getvalue())
 
 
 if __name__ == "__main__":

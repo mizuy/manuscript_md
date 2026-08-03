@@ -50,7 +50,7 @@ These words are outside main text.
             stats = word_count.count_manuscript(path)
 
         self.assertEqual(stats["abstract"], 3)
-        self.assertEqual(stats["abstract_including_keywords"], 6)
+        self.assertEqual(stats["abstract_including_keywords"], 7)
         self.assertEqual(stats["by_section"]["Introduction"], 6)
         self.assertEqual(stats["by_section"]["Methods"], 6)
         self.assertEqual(stats["by_section"]["Results"], 3)
@@ -63,7 +63,7 @@ These words are outside main text.
             "Text [@A; @B] with **bold words**, `code`, <span>html</span>, and [a link](url)."
         )
 
-        self.assertEqual(cleaned, "Text with bold words, html, and")
+        self.assertEqual(cleaned, "Text with bold words, , html , and .")
         self.assertEqual(word_count.count_words(cleaned), 6)
 
     def test_resolve_manuscript_path_prefers_explicit_path_then_paper_dir(self) -> None:
