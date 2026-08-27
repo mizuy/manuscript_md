@@ -3,9 +3,10 @@ name: manuscript_md
 description: >-
   Write scientific papers in Markdown and build Word docx (pandoc, Lua filters,
   reference.docx, submission TIFF). Use when editing manuscript.md or
-  supplementary.md, building review or journal upload packages, or applying
-  prose/table/supplement conventions. Companions: manuscript-reference,
-  word-docx-compare.
+  supplementary.md, building review or journal upload packages, applying
+  prose/table/supplement conventions, or building a title-page author /
+  affiliation list (Markdown, <sub> marks). Companions:
+  manuscript-reference, word-docx-compare.
 ---
 
 # manuscript_md
@@ -17,6 +18,7 @@ description: >-
 | Writing `manuscript.md` / `supplementary.md` | Vault/wiki literature notes only |
 | Building review docx or submission TIFF | Bib / `reference/` ingest only → **manuscript-reference** |
 | Prose / table / supplement conventions | Word Compare / version tag → **word-docx-compare** |
+| Title-page author / affiliation list (`<sub>` Markdown) | CRediT contribution statement → **credit-author-statement** |
 
 **Companions:** [manuscript-reference](../manuscript-reference/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md)
 
@@ -71,3 +73,16 @@ Research repos: flatten-include `$PAPER_PROJECT/Taskfile.yml`
 2. No inline code / pipeline identifiers in Methods/Results.
 3. Cite `[@pandoc-id]` — rebuild bib via **manuscript-reference**.
 4. Claims: paper-local `manuscript_instruction.md` / `comment.md`.
+
+## Author list
+
+Numbered affiliation blocks → remapped `<sub>` marks (title page, not CRediT).
+
+```bash
+# source: first line "Name,1 Name,2,3"; then "1. Department …"
+uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list.md
+task paper:author-list -- affiliations.txt --order authors.txt -o author_list.md
+```
+
+`--order` is one display name per line. Omit it to keep first-appearance order.
+Example blocks: [`templates/author_list.example.txt`](templates/author_list.example.txt).

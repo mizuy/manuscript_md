@@ -34,7 +34,7 @@ task paper:ingest-reference PAPER_DIR=/path/to/docs/my_paper
 
 | Need | Skill |
 |------|-------|
-| Prose / docx / submission | manuscript_md |
+| Prose / docx / submission / author list | manuscript_md |
 | Bib / reference notes / checkme | manuscript-reference |
 | Word Compare / versions | word-docx-compare |
 

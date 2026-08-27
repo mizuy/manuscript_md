@@ -53,6 +53,7 @@ task paper:docx \
 
 - `task paper:docx PAPER_DIR=/path/to/paper`: build Word docx (skill filters, no copy).
 - `task paper:words PAPER_DIR=/path/to/paper`: count abstract and main-text words.
+- `task paper:author-list -- affiliations.txt --order authors.txt -o author_list.md`: title-page author/affiliation list.
 - `task paper:build-bib PAPER_DIR=/path/to/paper`: generate `references.bib`.
 - `task paper:checkme PAPER_DIR=/path/to/paper`: citation dashboard (`checkme_paper.md`).
 - `task paper:submission PAPER_DIR=/path/to/paper`: upload package + TIFF.
@@ -97,6 +98,7 @@ uv run lab-paper build-bib --paper-dir /path/to/paper --scan-markdown
 uv run lab-paper expand-imports /path/to/paper/manuscript.md -o /path/to/paper/.build/manuscript.md
 uv run lab-paper patch-docx /path/to/paper/manuscript.docx
 uv run lab-paper word-count --paper-dir /path/to/paper
+uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list.md
 uv run lab-paper sync-assets --paper-dir /path/to/paper
 ```
 

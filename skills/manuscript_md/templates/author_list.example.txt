@@ -1,0 +1,4 @@
+Jane Doe,1 John Smith,1,2
+
+1. Department of Gastroenterology, Example Hospital
+2. Endoscopy Division, Example University

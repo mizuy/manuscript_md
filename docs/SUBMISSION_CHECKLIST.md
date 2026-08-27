@@ -6,6 +6,10 @@ Run this checklist before `task paper:docx` and journal submission.
 - Prose / figures: [`PROSE_CONVENTIONS.md`](PROSE_CONVENTIONS.md)
 - Supplementary policy: [`SUPPLEMENTARY_POLICY.md`](SUPPLEMENTARY_POLICY.md)
 
+## Title page
+
+- [ ] Author / affiliation `<sub>` marks remapped (`task paper:author-list` or `lab-paper author-list`) when merging lists from more than one source
+
 ## Manuscript
 
 - [ ] Abstract / Discussion / Conclusions aligned (no orphan claims)

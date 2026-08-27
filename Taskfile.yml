@@ -98,6 +98,11 @@ tasks:
     cmds:
       - uv run lab-paper word-count --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
 
+  paper:author-list:
+    desc: Remap author/affiliation numbers to Markdown (<sub> marks)
+    cmds:
+      - uv run lab-paper author-list {{.CLI_ARGS}}
+
   paper:submission:
     desc: Submission package (docx ± figures + TIFF @ DPI)
     deps: [paper:check-dir]
