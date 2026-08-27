@@ -139,11 +139,11 @@ task paper:compare \
 | `apply_formatting_without_tracking.py` | Strip formatting-revision markup |
 | `tag_version.sh` | `versions/{PREFIX}_v{N}.docx` + `_diff.docx` |
 
-## Local Cursor discovery
+## Local discovery
 
-For Agent discovery outside the manuscript_md workspace, keep a thin mirror or
-symlink at `~/.cursor/skills/word-docx-compare` pointing at this directory.
-Edit the repo copy first, then refresh the mirror if it is not a symlink.
+For Agent discovery outside the manuscript_md workspace, symlink this
+directory to `~/.agents/skills/word-docx-compare` (and `~/.claude/skills/`
+for Claude Code). See [`docs/INSTALL.md`](../../docs/INSTALL.md).
 
 ## Additional Resources
 

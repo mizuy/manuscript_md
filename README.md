@@ -1,6 +1,6 @@
 # manuscript_md
 
-Public **Cursor Agent Skills** + tooling for Markdown scientific papers → Word.
+Public **Agent Skills** + tooling for Markdown scientific papers → Word.
 
 **GitHub:** https://github.com/mizuy/manuscript_md  
 **Install:** [`docs/INSTALL.md`](docs/INSTALL.md)  
@@ -117,7 +117,7 @@ uv run lab-paper sync-assets --paper-dir /path/to/paper
 | [`docs/SUPPLEMENTARY_POLICY.md`](docs/SUPPLEMENTARY_POLICY.md) | Supplement rules |
 | [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | Final checklist |
 | [`docs/TABLE_WORD.md`](docs/TABLE_WORD.md) | Word table layout |
-| [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) | Cursor skill + scripts/filters/csl |
-| [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) | Cursor skill + bib / checkme |
-| [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) | Cursor skill + Compare scripts |
-| [`skills/strobe-checklist/SKILL.md`](skills/strobe-checklist/SKILL.md) | Cursor skill + STROBE cohort template |
+| [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) | Agent skill + scripts/filters/csl |
+| [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) | Agent skill + bib / checkme |
+| [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) | Agent skill + Compare scripts |
+| [`skills/strobe-checklist/SKILL.md`](skills/strobe-checklist/SKILL.md) | Agent skill + STROBE cohort template |

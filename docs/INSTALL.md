@@ -1,7 +1,8 @@
 # Installing manuscript_md skills (public)
 
-These are **Cursor Agent Skills** with bundled scripts. They live in one GitHub
-repo and work for any Markdown → Word paper project.
+These are **Agent Skills** with bundled scripts. They live in one GitHub
+repo and work for any Markdown → Word paper project. The skill format is
+the [Agent Skills](https://agentskills.io) `SKILL.md` standard.
 
 **Repo:** https://github.com/mizuy/manuscript_md
 
@@ -40,26 +41,34 @@ includes:
 
 See [`WORKFLOW.md#consumer-includes`](WORKFLOW.md#consumer-includes).
 
-## Option B — Personal Cursor skills (discovery)
+## Option B — Personal skills (discovery)
 
-Symlink or copy each skill folder into `~/.cursor/skills/`:
+Canonical personal path is `~/.agents/skills/` (Cursor and Codex). Claude Code
+uses `~/.claude/skills/`.
 
 ```bash
 REPO=/path/to/manuscript_md
-ln -sfn "$REPO/skills/manuscript_md" ~/.cursor/skills/manuscript_md
-ln -sfn "$REPO/skills/manuscript-reference" ~/.cursor/skills/manuscript-reference
-ln -sfn "$REPO/skills/word-docx-compare" ~/.cursor/skills/word-docx-compare
-ln -sfn "$REPO/skills/strobe-checklist" ~/.cursor/skills/strobe-checklist
+mkdir -p ~/.agents/skills ~/.claude/skills
+for s in manuscript_md manuscript-reference word-docx-compare strobe-checklist; do
+  ln -sfn "$REPO/skills/$s" ~/.agents/skills/$s
+  ln -sfn "$REPO/skills/$s" ~/.claude/skills/$s
+done
 ```
 
 Prefer **symlinks to the clone** so scripts/filters stay in sync. Thin pointer
 `SKILL.md` files alone are not enough to run builds.
 
+This repo also has `.agents/skills/` and `.claude/skills/` as discovery
+symlinks to `skills/`, so opening the clone as a workspace folder is enough
+for Cursor / Codex / Claude Code.
+
 ## Option C — Project skills
 
-Copy or submodule `skills/*` into your research repo’s `.cursor/skills/`
+Copy or submodule `skills/*` into your research repo’s `.agents/skills/`
 (and keep `PAPER_PROJECT` pointing at a checkout that has the Taskfile + `uv`
-package for builds).
+package for builds). For Claude Code, add `.claude/skills/<name>` →
+`../../.agents/skills/<name>`. Do not use `.cursor/skills/` as the canonical
+copy.
 
 ## Requirements
 

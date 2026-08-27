@@ -1,4 +1,8 @@
-# Skills (public Cursor Agent Skills)
+# Skills (public Agent Skills)
+
+Canonical packages live here (`skills/<name>/`). Discovery links for Cursor /
+Codex / Claude Code are `.agents/skills/` and `.claude/skills/` at the repo
+root.
 
 Canonical packages for Markdown scientific papers → Word.
 
