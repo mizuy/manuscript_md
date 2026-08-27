@@ -66,9 +66,8 @@ for Cursor / Codex / Claude Code.
 
 Copy or submodule `skills/*` into your research repo’s `.agents/skills/`
 (and keep `PAPER_PROJECT` pointing at a checkout that has the Taskfile + `uv`
-package for builds). For Claude Code, add `.claude/skills/<name>` →
-`../../.agents/skills/<name>`. Do not use `.cursor/skills/` as the canonical
-copy.
+package for builds). Cursor and Codex read `.agents/skills/`. For Claude Code,
+add `.claude/skills/<name>` → `../../.agents/skills/<name>`.
 
 ## Requirements
 
