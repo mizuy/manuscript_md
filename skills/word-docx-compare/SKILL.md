@@ -19,7 +19,7 @@ description: >-
 | `versions/` tag + manifest diff_base | Paperpile / bib / checkme → **manuscript-reference** |
 | Collaborator return vs pandoc rebuild | Linux/CI without Microsoft Word |
 
-**Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [manuscript-reference](../manuscript-reference/SKILL.md)
+**Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [manuscript-reference](../manuscript-reference/SKILL.md) · [strobe-checklist](../strobe-checklist/SKILL.md)
 
 ---
 

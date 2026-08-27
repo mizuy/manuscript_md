@@ -15,8 +15,10 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from bib_parse import (  # noqa: E402
+    format_abstract_english_block,
     format_metadata_block,
     load_bib,
+    replace_abstract_english_section,
     replace_metadata_section,
     update_title_line,
 )
@@ -51,12 +53,10 @@ def build_reference_bib(ref_root: Path, keys: list[str]) -> Path:
     from build_bibliography import build_references_bib
 
     keys_file = ref_root / "reference_keys.txt"
-    manual = ref_root.parent / "manual_entries.bib"
-    link = ref_root / "manual_entries.bib"
-    if manual.is_file() and not link.exists():
-        link.symlink_to(manual.resolve())
     out = ref_root / "reference.bib"
-    build_references_bib(ref_root, keys_file=keys_file, out_path=out)
+    # paper_dir = parent so manual_entries.bib lives once at paper root
+    # (do not symlink into reference/)
+    build_references_bib(ref_root.parent, keys_file=keys_file, out_path=out)
     return out
 
 
@@ -81,6 +81,9 @@ def sync_md_metadata(key: str, *, ref_root: Path, ref_bib: Path) -> str | None:
         pmid_override=pmid,
     )
     new_text = replace_metadata_section(md_text, body)
+    new_text = replace_abstract_english_section(
+        new_text, format_abstract_english_block(meta)
+    )
     if meta and meta.title:
         new_text = update_title_line(new_text, meta.title)
 

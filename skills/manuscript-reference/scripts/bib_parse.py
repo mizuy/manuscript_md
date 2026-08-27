@@ -229,6 +229,54 @@ def format_metadata_block(
     return "\n".join(lines)
 
 
+def format_abstract_english_block(meta: BibMeta | None) -> str:
+    """## Abstract（English） 節の本文（見出し行は含めない）。"""
+    if meta and meta.abstract:
+        return (
+            "<!-- auto: ingest_reference.py（reference.bib の abstract 全文をそのまま）— 要約・編集しない -->\n\n"
+            f"> {meta.abstract}"
+        )
+    return (
+        "<!-- auto: ingest_reference.py — paperpile.bib に abstract が無い -->\n\n"
+        "（paperpile.bib / reference.bib に `abstract` が無い）"
+    )
+
+
+def replace_abstract_english_section(md_text: str, body: str) -> str:
+    """## Abstract（English） を差し替え。無ければ変更しない。"""
+    section = f"## Abstract（English）\n\n{body}\n\n"
+    pattern = re.compile(r"^## Abstract（English）\n.*?(?=^## )", re.M | re.S)
+    if pattern.search(md_text):
+        return pattern.sub(section, md_text, count=1)
+    return md_text
+
+
+def format_abstract_ja_block(ja_text: str) -> str:
+    """## Abstract（日本語訳） 節の本文（見出し行は含めない）。"""
+    return (
+        "<!-- Abstract（English）の全文翻訳。要約・省略・再構成しない -->\n\n"
+        f"{ja_text.strip()}"
+    )
+
+
+def replace_abstract_ja_section(md_text: str, body: str) -> str:
+    """## Abstract（日本語訳） を差し替え。無ければ変更しない。"""
+    section = f"## Abstract（日本語訳）\n\n{body}\n\n"
+    pattern = re.compile(r"^## Abstract（日本語訳）\n.*?(?=^## )", re.M | re.S)
+    if pattern.search(md_text):
+        return pattern.sub(section, md_text, count=1)
+    return md_text
+
+
+def extract_abstract_english(md_text: str) -> str | None:
+    m = re.search(
+        r"^## Abstract（English）\n\n.*?\n\n> (.+?)\n\n^## Abstract（日本語訳）",
+        md_text,
+        re.S | re.M,
+    )
+    return m.group(1).strip() if m else None
+
+
 def replace_metadata_section(md_text: str, meta_body: str) -> str:
     """## メタデータ を差し替え。無ければタイトル直後に挿入。"""
     section = f"## メタデータ\n\n{meta_body}\n\n"

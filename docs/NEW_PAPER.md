@@ -37,5 +37,6 @@ task paper:ingest-reference PAPER_DIR=/path/to/docs/my_paper
 | Prose / docx / submission / author list | manuscript_md |
 | Bib / reference notes / checkme | manuscript-reference |
 | Word Compare / versions | word-docx-compare |
+| STROBE checklist (observational) | strobe-checklist |
 
 Install overview: [`INSTALL.md`](INSTALL.md).

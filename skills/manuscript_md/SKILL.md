@@ -6,7 +6,7 @@ description: >-
   supplementary.md, building review or journal upload packages, applying
   prose/table/supplement conventions, or building a title-page author /
   affiliation list (Markdown, <sub> marks). Companions:
-  manuscript-reference, word-docx-compare.
+  manuscript-reference, word-docx-compare, strobe-checklist.
 ---
 
 # manuscript_md
@@ -19,8 +19,9 @@ description: >-
 | Building review docx or submission TIFF | Bib / `reference/` ingest only → **manuscript-reference** |
 | Prose / table / supplement conventions | Word Compare / version tag → **word-docx-compare** |
 | Title-page author / affiliation list (`<sub>` Markdown) | CRediT contribution statement → **credit-author-statement** |
+| Wiring `@import "STROBE_checklist.md"` in the manuscript | Filling/auditing the checklist → **strobe-checklist** |
 
-**Companions:** [manuscript-reference](../manuscript-reference/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md)
+**Companions:** [manuscript-reference](../manuscript-reference/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md) · [strobe-checklist](../strobe-checklist/SKILL.md)
 
 **Install:** [`docs/INSTALL.md`](../../docs/INSTALL.md) · **GitHub:** https://github.com/mizuy/manuscript_md
 

@@ -39,6 +39,11 @@ Run this checklist before `task paper:docx` and journal submission.
 - [ ] Internal review notes file not referenced from manuscript or supplementary
 - [ ] No “Additional Supplementary …” strings left in `manuscript.md`
 
+## Reporting guidelines (when required)
+
+- [ ] Observational studies: `STROBE_checklist.md` filled (skill **strobe-checklist**); wired via `@import` or journal upload as required
+- [ ] Cover letter mentions STROBE when the journal asks
+
 ## Build
 
 - [ ] `task paper:docx` (or `lab-paper` equivalent) succeeds for review drafts

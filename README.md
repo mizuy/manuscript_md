@@ -11,6 +11,7 @@ Public **Cursor Agent Skills** + tooling for Markdown scientific papers → Word
 | manuscript_md | [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) |
 | manuscript-reference | [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) |
 | word-docx-compare | [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) |
+| strobe-checklist | [`skills/strobe-checklist/SKILL.md`](skills/strobe-checklist/SKILL.md) |
 
 ```bash
 git clone https://github.com/mizuy/manuscript_md.git
@@ -119,3 +120,4 @@ uv run lab-paper sync-assets --paper-dir /path/to/paper
 | [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) | Cursor skill + scripts/filters/csl |
 | [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) | Cursor skill + bib / checkme |
 | [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) | Cursor skill + Compare scripts |
+| [`skills/strobe-checklist/SKILL.md`](skills/strobe-checklist/SKILL.md) | Cursor skill + STROBE cohort template |

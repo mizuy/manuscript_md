@@ -9,6 +9,7 @@
 | `bmj.csl` | BMJ |
 | `gie.csl` | GIE |
 | `clinical-gastroenterology-and-hepatology.csl` | CGH（Clinical Gastroenterology and Hepatology） |
+| `the-american-journal-of-gastroenterology.csl` | AJG（The American Journal of Gastroenterology） |
 | `endoscopy.csl` | Endoscopy |
 | `den.csl` | DEN |
 | `jg.csl` | Journal of Gastroenterology |

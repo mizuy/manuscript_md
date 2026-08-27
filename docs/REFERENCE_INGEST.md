@@ -78,8 +78,26 @@ Skill ingest (`skills/manuscript-reference/scripts/`):
 
 - discover keys from `reference/md/*.md` and `reference/reference_keys.txt`
 - generate `reference/reference.bib` (via `build_bibliography.py`)
-- sync each `md/*.md` **## メタデータ** block (`bib_parse.py`)
+- sync each `md/*.md` **## メタデータ** and **## Abstract（English）** (`bib_parse.py`)
 - refresh `README.md` **## 一覧** only (preamble above it stays hand-edited)
+
+### Bootstrap new notes + PDFs
+
+```bash
+task paper:bootstrap-reference PAPER_DIR=/path/to/paper -- \
+  --tag duodenal_emr \
+  --keys-file /path/to/paper/reference/bootstrap_extra_keys.txt
+# or: --keys KeyA,KeyB
+```
+
+Optional: `PAPERPILE_PDF_ROOTS` (pathsep-separated) or repeated `--pdf-dir`.
+
+### Abstract 日本語訳
+
+```bash
+# once: uv sync --extra translate
+task paper:translate-abstract-ja PAPER_DIR=/path/to/paper
+```
 
 Do not vendor these scripts into the paper directory.
 

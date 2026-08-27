@@ -7,6 +7,7 @@ Canonical packages for Markdown scientific papers → Word.
 | [`manuscript_md/`](manuscript_md/SKILL.md) | `manuscript_md` | Writing conventions + docx / submission build |
 | [`manuscript-reference/`](manuscript-reference/SKILL.md) | `manuscript-reference` | Bibliography + literature notes + checkme |
 | [`word-docx-compare/`](word-docx-compare/SKILL.md) | `word-docx-compare` | macOS Word Compare + version tags |
+| [`strobe-checklist/`](strobe-checklist/SKILL.md) | `strobe-checklist` | Fill / audit STROBE observational checklist |
 
 Install: [`../docs/INSTALL.md`](../docs/INSTALL.md)
 

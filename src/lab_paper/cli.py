@@ -23,6 +23,8 @@ SCRIPT_COMMANDS: dict[str, Path] = {
     "word-count": SKILL_MD / "scripts" / "word_count.py",
     "author-list": SKILL_MD / "scripts" / "author_list.py",
     "ingest-reference": SKILL_REF / "scripts" / "ingest_reference.py",
+    "bootstrap-reference": SKILL_REF / "scripts" / "bootstrap_reference_notes.py",
+    "translate-abstract-ja": SKILL_REF / "scripts" / "translate_abstract_ja.py",
     "checkme": SKILL_REF / "scripts" / "checkme_dashboard.py",
 }
 

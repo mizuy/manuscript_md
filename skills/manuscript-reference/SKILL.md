@@ -17,7 +17,7 @@ description: >-
 | `reference/md` + PDF notes ingest | Markdown → docx → **manuscript_md** |
 | `checkme_paper.md` dashboard | Word Compare → **word-docx-compare** |
 
-**Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md)
+**Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [word-docx-compare](../word-docx-compare/SKILL.md) · [strobe-checklist](../strobe-checklist/SKILL.md)
 
 **Install:** [`docs/INSTALL.md`](../../docs/INSTALL.md) · **GitHub:** https://github.com/mizuy/manuscript_md
 
@@ -30,6 +30,8 @@ skills/manuscript-reference/
     build_bibliography.py
     bib_parse.py
     ingest_reference.py
+    bootstrap_reference_notes.py
+    translate_abstract_ja.py
     checkme_dashboard.py
 ```
 
@@ -41,11 +43,13 @@ export PAPER_PROJECT=/path/to/manuscript_md
 cd "$PAPER_PROJECT"
 
 task paper:build-bib PAPER_DIR=/path/to/paper
+task paper:bootstrap-reference PAPER_DIR=/path/to/paper -- --tag my_tag
 task paper:ingest-reference PAPER_DIR=/path/to/paper
+task paper:translate-abstract-ja PAPER_DIR=/path/to/paper   # needs: uv sync --extra translate
 task paper:checkme PAPER_DIR=/path/to/paper
 ```
 
-Or: `uv run lab-paper build-bib|ingest-reference|checkme …`
+Or: `uv run lab-paper build-bib|bootstrap-reference|ingest-reference|translate-abstract-ja|checkme …`
 
 ## Layout (paper side)
 

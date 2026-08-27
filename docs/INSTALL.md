@@ -12,6 +12,7 @@ repo and work for any Markdown → Word paper project.
 | [`skills/manuscript_md`](../skills/manuscript_md/SKILL.md) | Prose conventions, pandoc → docx, submission TIFF |
 | [`skills/manuscript-reference`](../skills/manuscript-reference/SKILL.md) | Paperpile → `references.bib`, `reference/` notes, checkme |
 | [`skills/word-docx-compare`](../skills/word-docx-compare/SKILL.md) | macOS Word Compare / `versions/` tagging |
+| [`skills/strobe-checklist`](../skills/strobe-checklist/SKILL.md) | Fill / audit STROBE checklist for observational papers |
 
 ## Option A — Clone + workspace (recommended)
 
@@ -48,6 +49,7 @@ REPO=/path/to/manuscript_md
 ln -sfn "$REPO/skills/manuscript_md" ~/.cursor/skills/manuscript_md
 ln -sfn "$REPO/skills/manuscript-reference" ~/.cursor/skills/manuscript-reference
 ln -sfn "$REPO/skills/word-docx-compare" ~/.cursor/skills/word-docx-compare
+ln -sfn "$REPO/skills/strobe-checklist" ~/.cursor/skills/strobe-checklist
 ```
 
 Prefer **symlinks to the clone** so scripts/filters stay in sync. Thin pointer

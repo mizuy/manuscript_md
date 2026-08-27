@@ -53,6 +53,22 @@ tasks:
         PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper ingest-reference
         --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
 
+  paper:bootstrap-reference:
+    desc: Bootstrap reference/md + pdf from Paperpile keys/tag
+    deps: [paper:check-dir]
+    cmds:
+      - >-
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper bootstrap-reference
+        --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
+
+  paper:translate-abstract-ja:
+    desc: Translate Abstract（English）→ Abstract（日本語訳） in reference/md
+    deps: [paper:check-dir]
+    cmds:
+      - >-
+        uv run lab-paper translate-abstract-ja
+        --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
+
   paper:checkme:
     desc: Update checkme_paper.md citation dashboard (auto section)
     deps: [paper:check-dir]
@@ -193,7 +209,7 @@ tasks:
     deps: [paper:check-dir]
     vars:
       VERSION: '{{.VERSION | default ""}}'
-      SOURCE: '{{.SOURCE | default "manuscript.docx"}}'
+      SOURCE: '{{.SOURCE | default ""}}'
       VERSION_PREFIX: '{{.VERSION_PREFIX | default "ADR_manuscript"}}'
     cmds:
       - |
@@ -201,10 +217,14 @@ tasks:
           echo "Usage: task paper:tag VERSION=5 [SOURCE=manuscript.docx]" >&2
           exit 1
         fi
+        SOURCE="{{.SOURCE}}"
+        if [ -z "$SOURCE" ]; then
+          SOURCE="{{.PAPER_DIR}}/manuscript.docx"
+        fi
         chmod +x "{{.SKILL_COMPARE}}/scripts/tag_version.sh"
         PAPER_DIR="{{.PAPER_DIR}}" PAPER_PROJECT="{{.TASKFILE_DIR}}" \
           VERSION_PREFIX="{{.VERSION_PREFIX}}" PYTHON="{{.PYTHON}}" \
-          "{{.SKILL_COMPARE}}/scripts/tag_version.sh" "{{.VERSION}}" "{{.SOURCE}}"
+          "{{.SKILL_COMPARE}}/scripts/tag_version.sh" "{{.VERSION}}" "$SOURCE"
 
   paper:diff:
     desc: Regenerate Word Compare diff from versions/manifest.yml
