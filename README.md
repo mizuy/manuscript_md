@@ -103,6 +103,20 @@ uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list
 uv run lab-paper sync-assets --paper-dir /path/to/paper
 ```
 
+## Development and testing
+
+Install the local package and run the dependency-free test suite:
+
+```bash
+uv sync
+uv run python -m unittest discover -s tests
+```
+
+Tests cover CLI dispatch, optional asset syncing, Markdown import expansion,
+word-count cleanup, and BibTeX metadata parsing. See
+[`docs/TESTING.md`](docs/TESTING.md) for the testing scope and conventions for
+adding new cases.
+
 ## Documentation
 
 | Doc | Content |
@@ -117,6 +131,7 @@ uv run lab-paper sync-assets --paper-dir /path/to/paper
 | [`docs/SUPPLEMENTARY_POLICY.md`](docs/SUPPLEMENTARY_POLICY.md) | Supplement rules |
 | [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | Final checklist |
 | [`docs/TABLE_WORD.md`](docs/TABLE_WORD.md) | Word table layout |
+| [`docs/TESTING.md`](docs/TESTING.md) | Test runner, scope, and conventions |
 | [`skills/manuscript_md/SKILL.md`](skills/manuscript_md/SKILL.md) | Agent skill + scripts/filters/csl |
 | [`skills/manuscript-reference/SKILL.md`](skills/manuscript-reference/SKILL.md) | Agent skill + bib / checkme |
 | [`skills/word-docx-compare/SKILL.md`](skills/word-docx-compare/SKILL.md) | Agent skill + Compare scripts |
