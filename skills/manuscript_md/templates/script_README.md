@@ -28,7 +28,7 @@ task paper:sync-assets PAPER_DIR=/path/to/this/paper
 ## Literature notes
 
 ```bash
-uv --directory /Users/mizuy/lab/manuscript_md run lab-paper ingest-reference --ref-dir reference/
+uv --directory /Users/mizuy/lab/manuscript_md run manuscript-md ingest-reference --ref-dir reference/
 ```
 
 See `/Users/mizuy/lab/manuscript_md/docs/REFERENCE_INGEST.md`.

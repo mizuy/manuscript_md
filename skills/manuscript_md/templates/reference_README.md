@@ -6,7 +6,7 @@
 - レイアウト: `/Users/mizuy/lab/manuscript_md/docs/PAPER_LAYOUT.md`
 - テンプレ: `_template.md`（`/Users/mizuy/lab/manuscript_md/templates/reference_note_template.md`）
 
-**ingest:** `uv run lab-paper ingest-reference --ref-dir reference/`
+**ingest:** `uv run manuscript-md ingest-reference --ref-dir reference/`
 
 
 原稿の引用は `manuscript.md` の `[@pandoc-id]` → 論文ルート `references.bib`（`citation_keys.txt` は使わない）。

@@ -69,7 +69,7 @@ key or add a manual entry.
 
 ```bash
 cd /Users/mizuy/lab/manuscript_md
-uv run lab-paper ingest-reference --ref-dir /path/to/paper/reference
+uv run manuscript-md ingest-reference --ref-dir /path/to/paper/reference
 # or
 task paper:ingest-reference PAPER_DIR=/path/to/paper
 ```
@@ -112,7 +112,7 @@ Paperpile export. Do not hand-edit generated `references.bib`.
 ```bash
 task paper:checkme PAPER_DIR=/path/to/paper
 # or
-uv run lab-paper checkme --paper-dir /path/to/paper
+uv run manuscript-md checkme --paper-dir /path/to/paper
 ```
 
 Writes/updates `checkme_paper.md` between markers:

@@ -8,18 +8,11 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from datetime import date
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
-
-from build_bibliography import (  # noqa: E402
-    extract_cite_keys_from_text,
-    resolve_paperpile_bib,
-    scan_keys_from_markdown,
-)
+from manuscript_md.bibliography import scan_keys_from_markdown
+from manuscript_md.paperpile import resolve_paperpile_bib
 
 BEGIN = "<!-- auto:checkme-dashboard -->"
 END = "<!-- /auto:checkme-dashboard -->"
@@ -71,7 +64,7 @@ def build_dashboard(paper_dir: Path, *, paperpile: Path | None) -> str:
     lines = [
         BEGIN,
         "",
-        f"_Generated {date.today().isoformat()} by `lab-paper checkme` "
+        f"_Generated {date.today().isoformat()} by `manuscript-md checkme` "
         f"(manuscript-reference). Paperpile: `{pp_label}`._",
         "",
         "## 総合ダッシュボード",
@@ -111,7 +104,7 @@ def build_dashboard(paper_dir: Path, *, paperpile: Path | None) -> str:
         f"cd {paper_dir}",
         "rg -o '\\[@[^\\]]+\\]' manuscript.md supplementary.md | sort -u",
         "ls reference/md/*.md | wc -l",
-        "task paper:checkme   # or: lab-paper checkme --paper-dir .",
+        "task paper:checkme   # or: manuscript-md checkme --paper-dir .",
         "```",
         "",
         END,

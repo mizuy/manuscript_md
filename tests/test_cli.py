@@ -7,10 +7,9 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
+import support  # noqa: F401
 
-from lab_paper import cli  # noqa: E402
+from manuscript_md import cli  # noqa: E402
 
 
 class CliTests(unittest.TestCase):
@@ -22,7 +21,7 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         output = stdout.getvalue()
-        self.assertIn("usage: lab-paper <command> [args]", output)
+        self.assertIn("usage: manuscript-md <command> [args]", output)
         self.assertIn("  sync-assets", output)
         self.assertIn("  word-count", output)
 

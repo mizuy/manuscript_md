@@ -15,7 +15,7 @@ and wrapped in ``<sub>…</sub>``.
 Usage:
     python author_list.py affiliations.txt --order authors.txt -o author_list.md
     python author_list.py a.txt b.txt --order authors.txt
-    uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list.md
+    uv run manuscript-md author-list affiliations.txt --order authors.txt -o author_list.md
 """
 
 from __future__ import annotations

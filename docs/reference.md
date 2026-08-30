@@ -1,6 +1,6 @@
 # manuscript_md Reference
 
-**manuscript_md** (`lab-paper` CLI) builds a Markdown paper directory into Word docx.
+**manuscript_md** (`manuscript-md` CLI) builds a Markdown paper directory into Word docx.
 
 ## Paths
 
