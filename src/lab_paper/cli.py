@@ -4,23 +4,24 @@ import argparse
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
+from lab_paper import bibliography, markdown, word_count
+from lab_paper.paths import SKILL_MD, SKILL_REF
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SKILL_MD = PROJECT_ROOT / "skills" / "manuscript_md"
-SKILL_REF = PROJECT_ROOT / "skills" / "manuscript-reference"
-
+LIBRARY_COMMANDS: dict[str, Callable[[list[str] | None], int]] = {
+    "build-bib": bibliography.main,
+    "expand-imports": markdown.main,
+    "word-count": word_count.main,
+}
 
 SCRIPT_COMMANDS: dict[str, Path] = {
-    "build-bib": SKILL_REF / "scripts" / "build_bibliography.py",
-    "expand-imports": SKILL_MD / "scripts" / "expand_imports.py",
     "export-figures": SKILL_MD / "scripts" / "export_submission_figures.py",
     "patch-docx": SKILL_MD / "scripts" / "patch_docx_tables.py",
     "reference-docx": SKILL_MD / "scripts" / "build_reference_docx.py",
     "resolve-csl": SKILL_MD / "scripts" / "resolve_csl.py",
     "resolve-reference-doc": SKILL_MD / "scripts" / "resolve_reference_doc.py",
-    "word-count": SKILL_MD / "scripts" / "word_count.py",
     "author-list": SKILL_MD / "scripts" / "author_list.py",
     "ingest-reference": SKILL_REF / "scripts" / "ingest_reference.py",
     "bootstrap-reference": SKILL_REF / "scripts" / "bootstrap_reference_notes.py",
@@ -112,14 +113,17 @@ def sync_assets(argv: list[str]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
+    all_commands = sorted([*LIBRARY_COMMANDS, *SCRIPT_COMMANDS, "sync-assets"])
     if not args or args[0] in {"-h", "--help"}:
-        commands = "\n".join(f"  {name}" for name in sorted([*SCRIPT_COMMANDS, "sync-assets"]))
+        commands = "\n".join(f"  {name}" for name in all_commands)
         print(f"usage: lab-paper <command> [args]\n\ncommands:\n{commands}")
         return 0 if args else 1
 
     command, rest = args[0], args[1:]
     if command == "sync-assets":
         return sync_assets(rest)
+    if command in LIBRARY_COMMANDS:
+        return LIBRARY_COMMANDS[command](rest)
     if command in SCRIPT_COMMANDS:
         return _run_script(SCRIPT_COMMANDS[command], rest)
 

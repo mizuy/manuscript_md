@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-import importlib.util
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "manuscript-reference" / "scripts" / "bib_parse.py"
-SPEC = importlib.util.spec_from_file_location("bib_parse", SCRIPT)
-assert SPEC and SPEC.loader
-bib_parse = importlib.util.module_from_spec(SPEC)
-sys.modules[SPEC.name] = bib_parse
-SPEC.loader.exec_module(bib_parse)
+import support  # noqa: F401
+
+from lab_paper import bib_parse
 
 
 ENTRY = """@article{Smith2024,

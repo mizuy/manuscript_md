@@ -35,5 +35,6 @@ The current tests cover the parts most likely to break paper builds:
   local paper project.
 - Keep tests independent of pandoc, Microsoft Word, and a real Paperpile export
   unless the test is explicitly documenting integration behavior.
-- When a script lives under a skill folder, load it by path in the test instead
-  of moving public skill files just for import convenience.
+- When a script lives under a skill folder, prefer importing the matching
+  `lab_paper` module in tests. Skill scripts are thin entry points that call
+  into `src/lab_paper/`.

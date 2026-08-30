@@ -8,13 +8,9 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
-
-from bib_parse import (  # noqa: E402
+from lab_paper.bib_parse import (
     format_abstract_english_block,
     format_metadata_block,
     load_bib,
@@ -22,6 +18,7 @@ from bib_parse import (  # noqa: E402
     replace_metadata_section,
     update_title_line,
 )
+from lab_paper.bibliography import build_references_bib
 
 
 def discover_keys(ref_root: Path) -> list[str]:
@@ -50,8 +47,6 @@ def write_reference_keys(ref_root: Path, keys: list[str]) -> None:
 
 
 def build_reference_bib(ref_root: Path, keys: list[str]) -> Path:
-    from build_bibliography import build_references_bib
-
     keys_file = ref_root / "reference_keys.txt"
     out = ref_root / "reference.bib"
     # paper_dir = parent so manual_entries.bib lives once at paper root

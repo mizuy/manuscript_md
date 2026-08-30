@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "manuscript_md" / "scripts" / "expand_imports.py"
-SPEC = importlib.util.spec_from_file_location("expand_imports", SCRIPT)
-assert SPEC and SPEC.loader
-expand_imports = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(expand_imports)
+import support  # noqa: F401
+
+from lab_paper import markdown as expand_imports
 
 
 class ExpandImportsTests(unittest.TestCase):

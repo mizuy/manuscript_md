@@ -8,18 +8,11 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from datetime import date
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
-
-from build_bibliography import (  # noqa: E402
-    extract_cite_keys_from_text,
-    resolve_paperpile_bib,
-    scan_keys_from_markdown,
-)
+from lab_paper.bibliography import scan_keys_from_markdown
+from lab_paper.paperpile import resolve_paperpile_bib
 
 BEGIN = "<!-- auto:checkme-dashboard -->"
 END = "<!-- /auto:checkme-dashboard -->"

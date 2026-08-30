@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "manuscript_md" / "scripts" / "word_count.py"
-SPEC = importlib.util.spec_from_file_location("word_count", SCRIPT)
-assert SPEC and SPEC.loader
-word_count = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(word_count)
+import support  # noqa: F401
+
+from lab_paper import word_count
 
 
 class WordCountTests(unittest.TestCase):
