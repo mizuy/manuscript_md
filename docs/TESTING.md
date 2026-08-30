@@ -27,6 +27,8 @@ The current tests cover the parts most likely to break paper builds:
 - Manuscript word counts for abstract, main text sections, citations, figures,
   tables, links, and front matter.
 - BibTeX metadata extraction used by reference ingest notes.
+- Author/affiliation list parsing and `<sub>` remapping.
+- CSL resolution order (paper-dir override vs bundled skill styles).
 
 ## Adding tests
 
