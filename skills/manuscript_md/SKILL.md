@@ -81,7 +81,7 @@ Numbered affiliation blocks → remapped `<sub>` marks (title page, not CRediT).
 
 ```bash
 # source: first line "Name,1 Name,2,3"; then "1. Department …"
-uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list.md
+uv run manuscript-md author-list affiliations.txt --order authors.txt -o author_list.md
 task paper:author-list -- affiliations.txt --order authors.txt -o author_list.md
 ```
 

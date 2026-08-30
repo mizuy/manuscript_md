@@ -4,7 +4,7 @@ Public **Agent Skills** + tooling for Markdown scientific papers → Word.
 
 **GitHub:** https://github.com/mizuy/manuscript_md  
 **Install:** [`docs/INSTALL.md`](docs/INSTALL.md)  
-**CLI:** `lab-paper` (`uv sync` in this repo)
+**CLI:** `manuscript-md` (`uv sync` in this repo)
 
 | Skill | Path |
 |-------|------|
@@ -92,15 +92,15 @@ See [`docs/SUPPLEMENTARY_POLICY.md`](docs/SUPPLEMENTARY_POLICY.md) and [`docs/SU
 
 ## CLI
 
-The Taskfile calls the `lab-paper` CLI. Direct usage is also available:
+The Taskfile calls the `manuscript-md` CLI. Direct usage is also available:
 
 ```bash
-uv run lab-paper build-bib --paper-dir /path/to/paper --scan-markdown
-uv run lab-paper expand-imports /path/to/paper/manuscript.md -o /path/to/paper/.build/manuscript.md
-uv run lab-paper patch-docx /path/to/paper/manuscript.docx
-uv run lab-paper word-count --paper-dir /path/to/paper
-uv run lab-paper author-list affiliations.txt --order authors.txt -o author_list.md
-uv run lab-paper sync-assets --paper-dir /path/to/paper
+uv run manuscript-md build-bib --paper-dir /path/to/paper --scan-markdown
+uv run manuscript-md expand-imports /path/to/paper/manuscript.md -o /path/to/paper/.build/manuscript.md
+uv run manuscript-md patch-docx /path/to/paper/manuscript.docx
+uv run manuscript-md word-count --paper-dir /path/to/paper
+uv run manuscript-md author-list affiliations.txt --order authors.txt -o author_list.md
+uv run manuscript-md sync-assets --paper-dir /path/to/paper
 ```
 
 ## Development and testing

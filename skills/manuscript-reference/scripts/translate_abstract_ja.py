@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-from lab_paper.bib_parse import (
+from manuscript_md.bib_parse import (
     extract_abstract_english,
     format_abstract_ja_block,
     replace_abstract_ja_section,

@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from lab_paper.paperpile import resolve_paperpile
+from manuscript_md.paperpile import resolve_paperpile
 
 
 def extract_entry_text(bib_text: str, key: str) -> str | None:

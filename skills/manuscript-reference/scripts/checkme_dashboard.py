@@ -11,8 +11,8 @@ import re
 from datetime import date
 from pathlib import Path
 
-from lab_paper.bibliography import scan_keys_from_markdown
-from lab_paper.paperpile import resolve_paperpile_bib
+from manuscript_md.bibliography import scan_keys_from_markdown
+from manuscript_md.paperpile import resolve_paperpile_bib
 
 BEGIN = "<!-- auto:checkme-dashboard -->"
 END = "<!-- /auto:checkme-dashboard -->"
@@ -64,7 +64,7 @@ def build_dashboard(paper_dir: Path, *, paperpile: Path | None) -> str:
     lines = [
         BEGIN,
         "",
-        f"_Generated {date.today().isoformat()} by `lab-paper checkme` "
+        f"_Generated {date.today().isoformat()} by `manuscript-md checkme` "
         f"(manuscript-reference). Paperpile: `{pp_label}`._",
         "",
         "## 総合ダッシュボード",
@@ -104,7 +104,7 @@ def build_dashboard(paper_dir: Path, *, paperpile: Path | None) -> str:
         f"cd {paper_dir}",
         "rg -o '\\[@[^\\]]+\\]' manuscript.md supplementary.md | sort -u",
         "ls reference/md/*.md | wc -l",
-        "task paper:checkme   # or: lab-paper checkme --paper-dir .",
+        "task paper:checkme   # or: manuscript-md checkme --paper-dir .",
         "```",
         "",
         END,

@@ -21,7 +21,7 @@ python -m unittest discover -s tests
 
 The current tests cover the parts most likely to break paper builds:
 
-- `lab-paper` CLI command dispatch and `sync-assets` copy behavior.
+- `manuscript-md` CLI command dispatch and `sync-assets` copy behavior.
 - Markdown `@import` expansion, nested import resolution, circular import
   detection, and table indentation normalization.
 - Manuscript word counts for abstract, main text sections, citations, figures,
@@ -36,5 +36,5 @@ The current tests cover the parts most likely to break paper builds:
 - Keep tests independent of pandoc, Microsoft Word, and a real Paperpile export
   unless the test is explicitly documenting integration behavior.
 - When a script lives under a skill folder, prefer importing the matching
-  `lab_paper` module in tests. Skill scripts are thin entry points that call
-  into `src/lab_paper/`.
+  `manuscript_md` module in tests. Skill scripts are thin entry points that call
+  into `src/manuscript_md/`.

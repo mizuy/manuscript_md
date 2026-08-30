@@ -19,8 +19,8 @@ import shutil
 import unicodedata
 from pathlib import Path
 
-from lab_paper.bib_parse import load_bib
-from lab_paper.paperpile import resolve_paperpile
+from manuscript_md.bib_parse import load_bib
+from manuscript_md.paperpile import resolve_paperpile
 
 # skills/manuscript_md/templates/reference_note_template.md
 SKILL_NOTE_TEMPLATE = (

@@ -27,4 +27,4 @@ task paper:docx PAPER_DIR=/path/to/paper PAPER_CSL=/path/to/custom.csl
 cp /Users/mizuy/lab/manuscript_md/csl/vancouver.csl /path/to/paper/
 ```
 
-一覧: `uv --directory /Users/mizuy/lab/manuscript_md run lab-paper resolve-csl --list`
+一覧: `uv --directory /Users/mizuy/lab/manuscript_md run manuscript-md resolve-csl --list`

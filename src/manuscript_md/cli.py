@@ -7,8 +7,8 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from lab_paper import bibliography, markdown, word_count
-from lab_paper.paths import SKILL_MD, SKILL_REF
+from manuscript_md import bibliography, markdown, word_count
+from manuscript_md.paths import SKILL_MD, SKILL_REF
 
 LIBRARY_COMMANDS: dict[str, Callable[[list[str] | None], int]] = {
     "build-bib": bibliography.main,
@@ -56,7 +56,7 @@ def _copytree_contents(src: Path, dst: Path, *, overwrite: bool) -> list[Path]:
 
 def sync_assets(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
-        prog="lab-paper sync-assets",
+        prog="manuscript-md sync-assets",
         description=(
             "Optional: copy Lua filters into PAPER_DIR/script/filters for "
             "paper-local overrides. Default docx build uses skill filters "
@@ -116,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     all_commands = sorted([*LIBRARY_COMMANDS, *SCRIPT_COMMANDS, "sync-assets"])
     if not args or args[0] in {"-h", "--help"}:
         commands = "\n".join(f"  {name}" for name in all_commands)
-        print(f"usage: lab-paper <command> [args]\n\ncommands:\n{commands}")
+        print(f"usage: manuscript-md <command> [args]\n\ncommands:\n{commands}")
         return 0 if args else 1
 
     command, rest = args[0], args[1:]

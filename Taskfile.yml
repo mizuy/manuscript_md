@@ -33,14 +33,14 @@ tasks:
     desc: 'Optional — copy filters into PAPER_DIR for local overrides'
     deps: [paper:check-dir]
     cmds:
-      - uv run lab-paper sync-assets --paper-dir "{{.PAPER_DIR}}" {{if eq .OVERWRITE "1"}}--overwrite{{end}}
+      - uv run manuscript-md sync-assets --paper-dir "{{.PAPER_DIR}}" {{if eq .OVERWRITE "1"}}--overwrite{{end}}
 
   paper:build-bib:
     desc: Build references.bib from manuscript citations and paperpile.bib
     deps: [paper:check-dir]
     cmds:
       - >-
-        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper build-bib
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run manuscript-md build-bib
         --paper-dir "{{.PAPER_DIR}}" --scan-markdown
         --paperpile-bib "{{.PAPERPILE_BIB}}"
         -o "{{.PAPER_DIR}}/references.bib"
@@ -50,7 +50,7 @@ tasks:
     deps: [paper:check-dir]
     cmds:
       - >-
-        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper ingest-reference
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run manuscript-md ingest-reference
         --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
 
   paper:bootstrap-reference:
@@ -58,7 +58,7 @@ tasks:
     deps: [paper:check-dir]
     cmds:
       - >-
-        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper bootstrap-reference
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run manuscript-md bootstrap-reference
         --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
 
   paper:translate-abstract-ja:
@@ -66,7 +66,7 @@ tasks:
     deps: [paper:check-dir]
     cmds:
       - >-
-        uv run lab-paper translate-abstract-ja
+        uv run manuscript-md translate-abstract-ja
         --ref-dir "{{.PAPER_DIR}}/reference" {{.CLI_ARGS}}
 
   paper:checkme:
@@ -74,7 +74,7 @@ tasks:
     deps: [paper:check-dir]
     cmds:
       - >-
-        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run lab-paper checkme
+        PAPERPILE_BIB="{{.PAPERPILE_BIB}}" uv run manuscript-md checkme
         --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
 
   paper:docx:
@@ -83,18 +83,18 @@ tasks:
     vars:
       CSL_PATH:
         sh: >-
-          uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+          uv run manuscript-md resolve-csl "{{.PAPER_CSL}}"
           --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
       REFERENCE_DOC_PATH:
         sh: >-
-          uv run lab-paper resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
+          uv run manuscript-md resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
           --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
     cmds:
       - task: paper:build-bib
         vars: { PAPER_DIR: "{{.PAPER_DIR}}", PAPERPILE_BIB: "{{.PAPERPILE_BIB}}" }
       - for: { var: FILES }
         cmd: >-
-          uv run lab-paper expand-imports
+          uv run manuscript-md expand-imports
           "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
           && cd "{{.PAPER_DIR}}"
           && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
@@ -106,18 +106,18 @@ tasks:
           --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
           ".build/{{.ITEM}}.md" -o "{{.ITEM}}.docx"
           && cd "{{.TASKFILE_DIR}}"
-          && uv run lab-paper patch-docx "{{.PAPER_DIR}}/{{.ITEM}}.docx"
+          && uv run manuscript-md patch-docx "{{.PAPER_DIR}}/{{.ITEM}}.docx"
 
   paper:words:
     desc: Count abstract and main-text words in manuscript.md
     deps: [paper:check-dir]
     cmds:
-      - uv run lab-paper word-count --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
+      - uv run manuscript-md word-count --paper-dir "{{.PAPER_DIR}}" {{.CLI_ARGS}}
 
   paper:author-list:
     desc: Remap author/affiliation numbers to Markdown (<sub> marks)
     cmds:
-      - uv run lab-paper author-list {{.CLI_ARGS}}
+      - uv run manuscript-md author-list {{.CLI_ARGS}}
 
   paper:submission:
     desc: Submission package (docx ± figures + TIFF @ DPI)
@@ -127,11 +127,11 @@ tasks:
       OUT_DIR: '{{.OUT_DIR | default ""}}'
       CSL_PATH:
         sh: >-
-          uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+          uv run manuscript-md resolve-csl "{{.PAPER_CSL}}"
           --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
       REFERENCE_DOC_PATH:
         sh: >-
-          uv run lab-paper resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
+          uv run manuscript-md resolve-reference-doc "{{.PAPER_REFERENCE_DOC}}"
           --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}"
       SUBMISSION_DIR:
         sh: >-
@@ -143,7 +143,7 @@ tasks:
       - mkdir -p "{{.SUBMISSION_DIR}}/figures"
       - for: { var: FILES }
         cmd: >-
-          uv run lab-paper expand-imports
+          uv run manuscript-md expand-imports
           "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
           && cd "{{.PAPER_DIR}}"
           && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
@@ -156,10 +156,10 @@ tasks:
           --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
           ".build/{{.ITEM}}.md" -o "{{.SUBMISSION_DIR}}/{{.ITEM}}.docx"
           && cd "{{.TASKFILE_DIR}}"
-          && uv run lab-paper patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}.docx"
+          && uv run manuscript-md patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}.docx"
       - for: { var: FILES }
         cmd: >-
-          uv run lab-paper expand-imports
+          uv run manuscript-md expand-imports
           "{{.PAPER_DIR}}/{{.ITEM}}.md" -o "{{.PAPER_DIR}}/.build/{{.ITEM}}.md"
           && cd "{{.PAPER_DIR}}"
           && "{{.PANDOC}}" -f "{{.PAPER_PANDOC_FROM}}" {{.PANDOC_FLAGS}}
@@ -171,9 +171,9 @@ tasks:
           --citeproc --bibliography=references.bib --csl="{{.CSL_PATH}}"
           ".build/{{.ITEM}}.md" -o "{{.SUBMISSION_DIR}}/{{.ITEM}}_with_figures.docx"
           && cd "{{.TASKFILE_DIR}}"
-          && uv run lab-paper patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}_with_figures.docx"
+          && uv run manuscript-md patch-docx "{{.SUBMISSION_DIR}}/{{.ITEM}}_with_figures.docx"
       - >-
-        uv run lab-paper export-figures
+        uv run manuscript-md export-figures
         --paper-dir "{{.PAPER_DIR}}" --files "{{.FILES}}"
         --out-dir "{{.SUBMISSION_DIR}}/figures" --dpi "{{.DPI}}"
       - 'echo "Submission package: {{.SUBMISSION_DIR}}"'
@@ -182,7 +182,7 @@ tasks:
     desc: Resolve or list bundled CSL files
     cmds:
       - >-
-        uv run lab-paper resolve-csl "{{.PAPER_CSL}}"
+        uv run manuscript-md resolve-csl "{{.PAPER_CSL}}"
         --paper-dir "{{.PAPER_DIR}}" --project-dir "{{.SKILL_MD}}" {{.CLI_ARGS}}
 
   # --- word-docx-compare ---

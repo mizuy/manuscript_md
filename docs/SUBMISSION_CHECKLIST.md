@@ -8,7 +8,7 @@ Run this checklist before `task paper:docx` and journal submission.
 
 ## Title page
 
-- [ ] Author / affiliation `<sub>` marks remapped (`task paper:author-list` or `lab-paper author-list`) when merging lists from more than one source
+- [ ] Author / affiliation `<sub>` marks remapped (`task paper:author-list` or `manuscript-md author-list`) when merging lists from more than one source
 
 ## Manuscript
 
@@ -46,7 +46,7 @@ Run this checklist before `task paper:docx` and journal submission.
 
 ## Build
 
-- [ ] `task paper:docx` (or `lab-paper` equivalent) succeeds for review drafts
+- [ ] `task paper:docx` (or `manuscript-md` equivalent) succeeds for review drafts
 - [ ] `task paper:submission` (or equivalent) for final upload: figure-free docx + TIFF @ 600 dpi
 - [ ] Word cycle (`paper:tag` / `paper:diff`) uses paths under the paper directory (not `/tmp`)
 

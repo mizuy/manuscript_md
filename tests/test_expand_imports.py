@@ -6,7 +6,7 @@ from pathlib import Path
 
 import support  # noqa: F401
 
-from lab_paper import markdown as expand_imports
+from manuscript_md import markdown as expand_imports
 
 
 class ExpandImportsTests(unittest.TestCase):

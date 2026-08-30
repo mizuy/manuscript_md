@@ -16,7 +16,7 @@ Canonical packages for Markdown scientific papers → Word.
 Install: [`../docs/INSTALL.md`](../docs/INSTALL.md)
 
 Build entrypoint remains the repo-root [`Taskfile.yml`](../Taskfile.yml)
-(`lab-paper` CLI). Skills hold the scripts/filters/docs the agent should follow.
+(`manuscript-md` CLI). Skills hold the scripts/filters/docs the agent should follow.
 
 ```text
 skills/<name>/

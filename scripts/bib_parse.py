@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compat: re-export lab_paper.bib_parse."""
+"""Compat: re-export manuscript_md.bib_parse."""
 from __future__ import annotations
 
-from lab_paper.bib_parse import *  # noqa: F403
+from manuscript_md.bib_parse import *  # noqa: F403

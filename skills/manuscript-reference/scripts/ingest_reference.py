@@ -10,7 +10,7 @@ import argparse
 import re
 from pathlib import Path
 
-from lab_paper.bib_parse import (
+from manuscript_md.bib_parse import (
     format_abstract_english_block,
     format_metadata_block,
     load_bib,
@@ -18,7 +18,7 @@ from lab_paper.bib_parse import (
     replace_metadata_section,
     update_title_line,
 )
-from lab_paper.bibliography import build_references_bib
+from manuscript_md.bibliography import build_references_bib
 
 
 def discover_keys(ref_root: Path) -> list[str]:
@@ -125,7 +125,7 @@ def rebuild_readme(ref_root: Path, keys: list[str], titles: dict[str, str]) -> N
             "",
             "1 論文 = `md/{pandoc-id}.md` + `pdf/{pandoc-id}.pdf` + `reference.bib`。",
             "",
-            "**ingest:** `uv run lab-paper ingest-reference --ref-dir reference/`",
+            "**ingest:** `uv run manuscript-md ingest-reference --ref-dir reference/`",
             "",
             "原稿の引用順は `manuscript.md` の `[@key]` と pandoc が決める（番号はメモに付けない）。",
             "",

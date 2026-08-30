@@ -6,7 +6,7 @@ from pathlib import Path
 
 import support  # noqa: F401
 
-from lab_paper import word_count
+from manuscript_md import word_count
 
 
 class WordCountTests(unittest.TestCase):

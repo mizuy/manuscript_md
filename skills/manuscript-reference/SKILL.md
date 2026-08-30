@@ -49,7 +49,7 @@ task paper:translate-abstract-ja PAPER_DIR=/path/to/paper   # needs: uv sync --e
 task paper:checkme PAPER_DIR=/path/to/paper
 ```
 
-Or: `uv run lab-paper build-bib|bootstrap-reference|ingest-reference|translate-abstract-ja|checkme …`
+Or: `uv run manuscript-md build-bib|bootstrap-reference|ingest-reference|translate-abstract-ja|checkme …`
 
 ## Layout (paper side)
 

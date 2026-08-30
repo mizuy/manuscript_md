@@ -4,8 +4,8 @@ import argparse
 import re
 from pathlib import Path
 
-from lab_paper.bib_parse import extract_entry_text
-from lab_paper.paperpile import resolve_paperpile_bib
+from manuscript_md.bib_parse import extract_entry_text
+from manuscript_md.paperpile import resolve_paperpile_bib
 
 # Pandoc citeproc keys only inside bracket citations, e.g. [@Example2024-aa] or [@a; @b]
 BRACKET_CITE_RE = re.compile(r"\[(@[^\]]+)\]")

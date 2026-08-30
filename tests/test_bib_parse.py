@@ -6,7 +6,7 @@ from pathlib import Path
 
 import support  # noqa: F401
 
-from lab_paper import bib_parse
+from manuscript_md import bib_parse
 
 
 ENTRY = """@article{Smith2024,
