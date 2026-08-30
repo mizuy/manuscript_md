@@ -9,7 +9,7 @@ from pathlib import Path
 
 import support  # noqa: F401
 
-from manuscript_md import cli  # noqa: E402
+from manuscript_md import cli, sync_assets  # noqa: E402
 
 
 class CliTests(unittest.TestCase):
@@ -40,7 +40,7 @@ class CliTests(unittest.TestCase):
 
             first_stdout = io.StringIO()
             with redirect_stdout(first_stdout):
-                first_exit = cli.sync_assets(["--paper-dir", str(paper_dir)])
+                first_exit = sync_assets.sync_assets(["--paper-dir", str(paper_dir)])
 
             self.assertEqual(first_exit, 0)
             copied_filter = paper_dir / "script" / "filters" / "pagebreak.lua"
@@ -50,7 +50,7 @@ class CliTests(unittest.TestCase):
             copied_filter.write_text("-- local override\n", encoding="utf-8")
             second_stdout = io.StringIO()
             with redirect_stdout(second_stdout):
-                second_exit = cli.sync_assets(["--paper-dir", str(paper_dir)])
+                second_exit = sync_assets.sync_assets(["--paper-dir", str(paper_dir)])
 
             self.assertEqual(second_exit, 0)
             self.assertEqual(copied_filter.read_text(encoding="utf-8"), "-- local override\n")
@@ -63,7 +63,7 @@ class CliTests(unittest.TestCase):
             stdout = io.StringIO()
 
             with redirect_stdout(stdout):
-                exit_code = cli.sync_assets(
+                exit_code = sync_assets.sync_assets(
                     [
                         "--paper-dir",
                         str(paper_dir),
