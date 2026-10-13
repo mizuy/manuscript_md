@@ -194,6 +194,7 @@ tasks:
       BASE: '{{.BASE | default ""}}'
       CHANGED: '{{.CHANGED | default ""}}'
       OUTPUT: '{{.OUTPUT | default ""}}'
+      ENGINE: '{{.ENGINE | default .DOCX_DIFF_ENGINE | default "word"}}'
     cmds:
       - |
         if [ -z "{{.BASE}}" ] || [ -z "{{.CHANGED}}" ]; then
@@ -202,7 +203,8 @@ tasks:
         fi
         cd "{{.PAPER_DIR}}"
         chmod +x "{{.SKILL_COMPARE}}/scripts/compare_docx.sh"
-        "{{.SKILL_COMPARE}}/scripts/compare_docx.sh" "{{.BASE}}" "{{.CHANGED}}" "{{.OUTPUT}}"
+        DOCX_DIFF_ENGINE="{{.ENGINE}}" PYTHON="{{.PYTHON}}" \
+          "{{.SKILL_COMPARE}}/scripts/compare_docx.sh" "{{.BASE}}" "{{.CHANGED}}" "{{.OUTPUT}}"
 
   paper:tag:
     desc: Tag manuscript.docx as versions/v{N} and diff vs manifest base

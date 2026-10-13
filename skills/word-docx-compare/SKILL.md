@@ -77,6 +77,28 @@ SKILL="$PAPER_PROJECT/skills/word-docx-compare"
 
 Leave OUTPUT omitted to open the result in Word without saving.
 
+## Python Engine (no Word)
+
+`--engine python` (or `DOCX_DIFF_ENGINE=python`) skips Word and writes the
+diff with `diff_docx.py` (`manuscript-md diff-docx`):
+
+- Compares text only. Style, run formatting, and paragraph properties are
+  ignored; the output keeps CHANGED's formatting.
+- Diffs at the character level inside each paragraph, so `1,234` → `1,345`
+  shows as `1,[-2-]34{+5+}`, not a whole-line replacement.
+- Short matches between edits are merged (diff-match-patch style), so
+  `studied` → `analysed` shows as `[-studi-]{+analys+}ed`. `--raw` turns this off.
+- Works on Linux/CI. Tracked changes already in the inputs are accepted first.
+
+```bash
+"$SKILL/scripts/compare_docx.sh" --engine python BASE.docx CHANGED.docx OUTPUT.docx
+task paper:compare ENGINE=python BASE=... CHANGED=... OUTPUT=...
+```
+
+Limits: only the body (`word/document.xml`) is compared, so footnotes,
+headers, and comments are not diffed. Table row insertions show as text
+changes. Deleted paragraphs are restored as plain text (images dropped).
+
 ## Tag a New Version + Auto-diff
 
 When `versions/manifest.yml` exists, `diff_base` in the manifest selects the
@@ -137,6 +159,7 @@ task paper:compare \
 | `compare_docx.applescript` | Word Compare + optional save |
 | `compare_docx.sh` | Shell wrapper; `--format` to include formatting |
 | `apply_formatting_without_tracking.py` | Strip formatting-revision markup |
+| `diff_docx.py` | Python engine: character-level text diff, no Word |
 | `tag_version.sh` | `versions/{PREFIX}_v{N}.docx` + `_diff.docx` |
 
 ## Local discovery
