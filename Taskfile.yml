@@ -188,13 +188,13 @@ tasks:
   # --- word-docx-compare ---
 
   paper:compare:
-    desc: Word Compare two docx files (macOS; paths under PAPER_DIR)
+    desc: Compare two docx files (character-level text diff; ENGINE=word for Word Compare)
     deps: [paper:check-dir]
     vars:
       BASE: '{{.BASE | default ""}}'
       CHANGED: '{{.CHANGED | default ""}}'
       OUTPUT: '{{.OUTPUT | default ""}}'
-      ENGINE: '{{.ENGINE | default .DOCX_DIFF_ENGINE | default "word"}}'
+      ENGINE: '{{.ENGINE | default .DOCX_DIFF_ENGINE | default "python"}}'
     cmds:
       - |
         if [ -z "{{.BASE}}" ] || [ -z "{{.CHANGED}}" ]; then
@@ -229,7 +229,7 @@ tasks:
           "{{.SKILL_COMPARE}}/scripts/tag_version.sh" "{{.VERSION}}" "$SOURCE"
 
   paper:diff:
-    desc: Regenerate Word Compare diff from versions/manifest.yml
+    desc: Regenerate docx diff from versions/manifest.yml
     deps: [paper:check-dir]
     vars:
       ENTRY: '{{.ENTRY | default ""}}'

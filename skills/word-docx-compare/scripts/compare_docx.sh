@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Compare two .docx files with Microsoft Word (macOS).
-# Paths must live under a local folder Word can access (not /tmp).
+# Compare two .docx files: Python character-level diff (default) or
+# Microsoft Word Compare (macOS; paths must not be under /tmp).
 set -euo pipefail
 
 usage() {
@@ -8,23 +8,23 @@ usage() {
 Usage: compare_docx.sh [OPTIONS] BASE.docx CHANGED.docx [OUTPUT.docx]
 
 Options:
-  --format          Track style/formatting changes in the diff (Word only)
-  --engine ENGINE   word (default; macOS + Word Compare) or python
-                    (character-level text diff, no Word; OUTPUT required).
+  --engine ENGINE   python (default; character-level text diff, no Word)
+                    or word (macOS + Word Compare).
                     Default can also be set with DOCX_DIFF_ENGINE.
+  --format          Track style/formatting changes (implies --engine word)
 
   BASE.docx     Original document (e.g. collaborator's Word edit)
   CHANGED.docx  Revised document (e.g. pandoc output from manuscript.md)
-  OUTPUT.docx   Optional. Save tracked-changes result; omit to leave open in Word.
+  OUTPUT.docx   Optional. Save tracked-changes result; omit to write a
+                preview under .compare/ and open it in Word.
 
-By default, revised formatting is applied to the comparison document, but
-formatting-only revision markup is removed so only text/content
-revisions remain visible. Use --format to keep formatting revisions visible.
+Both engines ignore formatting by default: the result keeps CHANGED's
+formatting and shows only text revisions.
 EOF
 }
 
 DETECT_FORMAT="false"
-ENGINE="${DOCX_DIFF_ENGINE:-word}"
+ENGINE="${DOCX_DIFF_ENGINE:-python}"
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -34,6 +34,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --format)
       DETECT_FORMAT="true"
+      ENGINE="word"
       shift
       ;;
     --engine)
@@ -73,8 +74,8 @@ if [[ ! -f "$CHANGED" ]]; then
 fi
 if [[ "$ENGINE" == "python" ]]; then
   if [[ -z "$OUTPUT" || "$OUTPUT" == "-" ]]; then
-    echo "--engine python requires OUTPUT.docx" >&2
-    exit 1
+    OUTPUT="$(dirname "$CHANGED")/.compare/compare_preview_$$.docx"
+    OPEN_PREVIEW="true"
   fi
   mkdir -p "$(dirname "$OUTPUT")"
   OUTPUT="$(cd "$(dirname "$OUTPUT")" && pwd)/$(basename "$OUTPUT")"
@@ -82,6 +83,9 @@ if [[ "$ENGINE" == "python" ]]; then
     eval "$PYTHON \"\$SCRIPT_DIR/diff_docx.py\" \"\$BASE\" \"\$CHANGED\" \"\$OUTPUT\""
   else
     python3 "$SCRIPT_DIR/diff_docx.py" "$BASE" "$CHANGED" "$OUTPUT"
+  fi
+  if [[ "$OPEN_PREVIEW" == "true" ]] && command -v open >/dev/null 2>&1; then
+    open -a "Microsoft Word" "$OUTPUT" || open "$OUTPUT"
   fi
   exit 0
 elif [[ "$ENGINE" != "word" ]]; then
