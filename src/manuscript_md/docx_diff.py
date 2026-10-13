@@ -17,6 +17,7 @@ import argparse
 import copy
 import datetime as dt
 import difflib
+import hashlib
 import io
 import itertools
 import os
@@ -31,6 +32,11 @@ W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
 DOCUMENT_PART = "word/document.xml"
 OBJECT_CHAR = "￼"
+# Images get one private-use character per distinct picture, so a replaced
+# figure shows as a change while an unchanged one matches.
+IMAGE_CHAR_BASE = 0xF0000
+RELS_PART = "word/_rels/document.xml.rels"
+_object_chars: dict[ET.Element, str] = {}
 
 
 def w(tag: str) -> str:
@@ -152,7 +158,13 @@ def paragraph_runs(p: ET.Element) -> list[ET.Element]:
     return [r for r in p.iter(w("r")) if r not in nested]
 
 
+def is_object_char(char: str) -> bool:
+    return char == OBJECT_CHAR or IMAGE_CHAR_BASE <= ord(char) < IMAGE_CHAR_BASE + 0xFFFE
+
+
 def element_text(child: ET.Element) -> str:
+    if child in _object_chars:
+        return _object_chars[child]
     if child.tag == w("t"):
         return child.text or ""
     if child.tag == w("sym"):
@@ -351,8 +363,12 @@ def similarity(a: str, b: str) -> float:
     return matcher.ratio()
 
 
-def align_block(old, new, i1, i2, j1, j2, threshold: float = 0.4):
-    """Best monotonic pairing of a changed block by text similarity."""
+def align_block(old, new, i1, i2, j1, j2, threshold: float = 0.45):
+    """Best monotonic pairing of a changed block by text similarity.
+
+    A pair scores its similarity above the threshold, so one close match
+    beats two weak ones.
+    """
     n, m = i2 - i1, j2 - j1
     if n * m > 250_000:
         sims = None
@@ -364,13 +380,13 @@ def align_block(old, new, i1, i2, j1, j2, threshold: float = 0.4):
             best = max(score[a + 1][b], score[a][b + 1])
             s = sims[a][b] if sims else 0.0
             if s >= threshold:
-                best = max(best, s + score[a + 1][b + 1])
+                best = max(best, s - threshold + score[a + 1][b + 1])
             score[a][b] = best
     pairs = []
     a = b = 0
     while a < n and b < m:
         s = sims[a][b] if sims else 0.0
-        if s >= threshold and score[a][b] == s + score[a + 1][b + 1]:
+        if s >= threshold and score[a][b] == s - threshold + score[a + 1][b + 1]:
             pairs.append((i1 + a, j1 + b))
             a += 1
             b += 1
@@ -423,7 +439,7 @@ class Revisions:
             elif char == "\n":
                 flush()
                 ET.SubElement(run, w("br"))
-            elif char != OBJECT_CHAR:
+            elif not is_object_char(char):
                 buffer += char
         flush()
         wrapper = self.element("del")
@@ -442,6 +458,13 @@ class Revisions:
             index = list(ppr).index(tail[0]) if tail else len(ppr)
             ppr.insert(index, rpr)
         rpr.insert(0, self.element(kind))
+
+    def mark_row(self, tr: ET.Element, kind: str) -> None:
+        trpr = tr.find(w("trPr"))
+        if trpr is None:
+            trpr = ET.Element(w("trPr"))
+            tr.insert(1 if tr.find(w("tblPrEx")) is not None else 0, trpr)
+        trpr.append(self.element(kind))
 
 
 def apply_paragraph_diff(p: ET.Element, old_text: str, rev: Revisions, cleanup: bool) -> int:
@@ -545,6 +568,29 @@ def insert_whole_paragraph(p: ET.Element, rev: Revisions) -> None:
     rev.mark_paragraph(p, "ins")
 
 
+def row_of(p: ET.Element, parents: dict[ET.Element, ET.Element]) -> ET.Element | None:
+    cell = parents.get(p)
+    if cell is None or cell.tag != w("tc"):
+        return None
+    return parents.get(cell)
+
+
+def row_paragraphs(tr: ET.Element) -> list[ET.Element]:
+    return [p for tc in tr.findall(w("tc")) for p in tc.findall(w("p"))]
+
+
+def deleted_row(old_tr: ET.Element, rev: Revisions) -> ET.Element:
+    """A copy of an old table row with its text and the row marked deleted."""
+    tr = copy.deepcopy(old_tr)
+    for tc in tr.findall(w("tc")):
+        for k, child in enumerate(list(tc)):
+            if child.tag == w("p"):
+                tc.remove(child)
+                tc.insert(k, deleted_paragraph(child, rev))
+    rev.mark_row(tr, "del")
+    return tr
+
+
 def deleted_paragraph(old_p: ET.Element, rev: Revisions) -> ET.Element:
     """A plain-text copy of an old paragraph, marked fully deleted."""
     p = ET.Element(w("p"))
@@ -557,7 +603,7 @@ def deleted_paragraph(old_p: ET.Element, rev: Revisions) -> ET.Element:
         p.append(ppr)
     for run in paragraph_runs(old_p):
         text = "".join(element_text(c) for c in run)
-        if text.strip(OBJECT_CHAR):
+        if any(not is_object_char(c) for c in text):
             p.append(rev.deleted_run(text, run.find(w("rPr"))))
     merge_adjacent_wrappers(p)
     rev.mark_paragraph(p, "del")
@@ -568,12 +614,46 @@ def deleted_paragraph(old_p: ET.Element, rev: Revisions) -> ET.Element:
 # Driver
 
 
+def image_hashes(package: zipfile.ZipFile) -> dict[str, str]:
+    """Map relationship ids of document.xml to a hash of the target image."""
+    try:
+        rels = ET.fromstring(package.read(RELS_PART))
+    except KeyError:
+        return {}
+    names = set(package.namelist())
+    result = {}
+    for rel in rels:
+        target = rel.get("Target", "")
+        name = target.lstrip("/") if target.startswith("/") else f"word/{target}"
+        if rel.get("TargetMode") != "External" and name in names:
+            result[rel.get("Id", "")] = hashlib.sha1(package.read(name)).hexdigest()
+    return result
+
+
+def tag_images(root: ET.Element, hashes: dict[str, str], chars: dict[str, str]) -> None:
+    for tag in ("drawing", "pict", "object"):
+        for elem in root.iter(w(tag)):
+            ids = [
+                value
+                for node in elem.iter()
+                for key, value in node.attrib.items()
+                if key.endswith(("}embed", "}id")) and value in hashes
+            ]
+            if ids:
+                digest = hashes[ids[0]]
+                if digest not in chars:
+                    chars[digest] = chr(IMAGE_CHAR_BASE + len(chars))
+                _object_chars[elem] = chars[digest]
+
+
 def diff_documents(
     base_xml: bytes,
     changed_xml: bytes,
     author: str = "manuscript_md",
     date: str | None = None,
     cleanup: bool = True,
+    base_images: dict[str, str] | None = None,
+    changed_images: dict[str, str] | None = None,
 ) -> tuple[bytes, dict[str, int]]:
     register_namespaces(base_xml)
     register_namespaces(changed_xml)
@@ -581,6 +661,10 @@ def diff_documents(
     new_root = ET.fromstring(changed_xml)
     accept_existing_revisions(base_root)
     accept_existing_revisions(new_root)
+    _object_chars.clear()
+    image_chars: dict[str, str] = {}
+    tag_images(base_root, base_images or {}, image_chars)
+    tag_images(new_root, changed_images or {}, image_chars)
     date = date or dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     rev = Revisions(author, date)
 
@@ -607,10 +691,42 @@ def diff_documents(
         else:
             pending_deletes.append((i, last_new))
 
+    # Whole table rows become row-level revisions.
+    old_parents = parent_map(base_root)
+    old_index = {p: k for k, p in enumerate(old_ps)}
+    new_index = {p: k for k, p in enumerate(new_ps)}
+    inserted = {j for i, j in pairs if i is None}
+    for tr in new_root.iter(w("tr")):
+        cells = row_paragraphs(tr)
+        if cells and all(new_index.get(p) in inserted for p in cells):
+            rev.mark_row(tr, "ins")
+    deleted = {i for i, _ in pending_deletes}
+    remaining: list[tuple[int, int | None]] = []
+    done_rows: set[ET.Element] = set()
+    row_offsets: dict[ET.Element, int] = {}
+    for i, after in pending_deletes:
+        old_tr = row_of(old_ps[i], old_parents)
+        new_tr = row_of(new_ps[after], parents) if after is not None else None
+        if (
+            old_tr is None
+            or new_tr is None
+            or not all(old_index.get(p) in deleted for p in row_paragraphs(old_tr))
+        ):
+            remaining.append((i, after))
+            continue
+        stats["deleted"] += 1
+        if old_tr in done_rows:
+            continue
+        done_rows.add(old_tr)
+        table = parents[new_tr]
+        index = list(table).index(new_tr) + 1 + row_offsets.get(new_tr, 0)
+        row_offsets[new_tr] = row_offsets.get(new_tr, 0) + 1
+        table.insert(index, deleted_row(old_tr, rev))
+
     # Insert deleted paragraphs after the preceding new paragraph, keeping
     # them out of table cells when the old paragraph was in the body.
     offsets: dict[int | None, int] = {}
-    for i, after in pending_deletes:
+    for i, after in remaining:
         old_p = old_ps[i]
         old_in_cell = any(old_p in list(tc) for tc in base_root.iter(w("tc")))
         new_p = deleted_paragraph(old_p, rev)
@@ -621,7 +737,7 @@ def diff_documents(
             offsets[after] = offsets.get(after, 0) + 1
         else:
             following = next(
-                (new_ps[j] for j in range((after or -1) + 1, len(new_ps))), None
+                (new_ps[j] for j in range(0 if after is None else after + 1, len(new_ps))), None
             )
             if following is not None and (parents[following].tag == w("tc")) == old_in_cell:
                 parent = parents[following]
@@ -642,6 +758,7 @@ def diff_documents(
         parents[new_p] = parent
         stats["deleted"] += 1
 
+    _object_chars.clear()
     return serialize(new_root, changed_xml), stats
 
 
@@ -654,9 +771,17 @@ def diff_docx(
 ) -> dict[str, int]:
     with zipfile.ZipFile(base) as zb:
         base_xml = zb.read(DOCUMENT_PART)
+        base_images = image_hashes(zb)
     with zipfile.ZipFile(changed) as zc:
         changed_xml = zc.read(DOCUMENT_PART)
-        result, stats = diff_documents(base_xml, changed_xml, author, cleanup=cleanup)
+        result, stats = diff_documents(
+            base_xml,
+            changed_xml,
+            author,
+            cleanup=cleanup,
+            base_images=base_images,
+            changed_images=image_hashes(zc),
+        )
         output.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(prefix=f".{output.stem}.", suffix=".docx", dir=output.parent)
         os.close(fd)

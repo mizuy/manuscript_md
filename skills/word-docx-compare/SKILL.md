@@ -95,9 +95,14 @@ diff with `diff_docx.py` (`manuscript-md diff-docx`):
 task paper:compare ENGINE=python BASE=... CHANGED=... OUTPUT=...
 ```
 
+Table rows added or removed as a whole become row revisions. Images are
+compared by content, so a replaced figure shows as inserted.
+
 Limits: only the body (`word/document.xml`) is compared, so footnotes,
-headers, and comments are not diffed. Table row insertions show as text
-changes. Deleted paragraphs are restored as plain text (images dropped).
+headers, and comments are not diffed. Deleted paragraphs are restored as
+plain text; a removed or replaced image is not shown as deleted.
+
+Sample files to open in Word: `tests/fixtures/docx_diff/` (see its README).
 
 ## Tag a New Version + Auto-diff
 

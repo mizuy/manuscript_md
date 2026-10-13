@@ -128,5 +128,43 @@ class DocxDiffTests(unittest.TestCase):
                 self.assertEqual(view(z.read(docx_diff.DOCUMENT_PART), "accept"), ["two"])
 
 
+    def test_table_rows_are_row_revisions(self) -> None:
+        def table(*rows: str) -> bytes:
+            cells = "".join(
+                "<w:tr>" + "".join(
+                    f'<w:tc><w:p><w:r><w:t>{c}</w:t></w:r></w:p></w:tc>' for c in row.split(",")
+                ) + "</w:tr>"
+                for row in rows
+            )
+            return document().replace(b"<w:sectPr/>", f"<w:tbl>{cells}</w:tbl><w:sectPr/>".encode())
+
+        out, _ = docx_diff.diff_documents(table("a,1", "b,2", "c,3"), table("a,1", "c,4", "d,5"))
+        marks = [
+            [mark.tag for mark in tr.iterfind(f"{w('trPr')}/*")]
+            for tr in ET.fromstring(out).iter(w("tr"))
+        ]
+        self.assertEqual(marks, [[], [w("del")], [], [w("ins")]])
+        self.assertEqual(view(out, "reject"), ["a", "1", "b", "2", "c", "3"])
+        self.assertEqual(view(out, "accept"), ["a", "1", "c", "4", "d", "5"])
+
+    def test_sample_files_round_trip(self) -> None:
+        samples = Path(__file__).parent / "fixtures" / "docx_diff"
+        cases = sorted(p for p in samples.iterdir() if (p / "diff.docx").exists())
+        self.assertTrue(cases)
+        for case in cases:
+            with self.subTest(case.name):
+                texts = {}
+                for name in ("old", "new"):
+                    with zipfile.ZipFile(case / f"{name}.docx") as z:
+                        texts[name] = view(z.read(docx_diff.DOCUMENT_PART), "accept")
+                with tempfile.TemporaryDirectory() as tmp:
+                    output = Path(tmp) / "diff.docx"
+                    docx_diff.diff_docx(case / "old.docx", case / "new.docx", output)
+                    with zipfile.ZipFile(output) as z:
+                        xml = z.read(docx_diff.DOCUMENT_PART)
+                self.assertEqual(view(xml, "accept"), texts["new"])
+                self.assertEqual(view(xml, "reject"), texts["old"])
+
+
 if __name__ == "__main__":
     unittest.main()
