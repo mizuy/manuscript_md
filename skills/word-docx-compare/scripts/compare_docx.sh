@@ -8,7 +8,10 @@ usage() {
 Usage: compare_docx.sh [OPTIONS] BASE.docx CHANGED.docx [OUTPUT.docx]
 
 Options:
-  --format   Track style/formatting changes in the diff
+  --format          Track style/formatting changes in the diff (Word only)
+  --engine ENGINE   word (default; macOS + Word Compare) or python
+                    (character-level text diff, no Word; OUTPUT required).
+                    Default can also be set with DOCX_DIFF_ENGINE.
 
   BASE.docx     Original document (e.g. collaborator's Word edit)
   CHANGED.docx  Revised document (e.g. pandoc output from manuscript.md)
@@ -21,6 +24,7 @@ EOF
 }
 
 DETECT_FORMAT="false"
+ENGINE="${DOCX_DIFF_ENGINE:-word}"
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -30,6 +34,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --format)
       DETECT_FORMAT="true"
+      shift
+      ;;
+    --engine)
+      ENGINE="${2:-}"
+      shift 2
+      ;;
+    --engine=*)
+      ENGINE="${1#--engine=}"
       shift
       ;;
     *)
@@ -59,6 +71,24 @@ if [[ ! -f "$CHANGED" ]]; then
   echo "Changed file not found: $CHANGED" >&2
   exit 1
 fi
+if [[ "$ENGINE" == "python" ]]; then
+  if [[ -z "$OUTPUT" || "$OUTPUT" == "-" ]]; then
+    echo "--engine python requires OUTPUT.docx" >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$OUTPUT")"
+  OUTPUT="$(cd "$(dirname "$OUTPUT")" && pwd)/$(basename "$OUTPUT")"
+  if [[ -n "${PYTHON:-}" ]]; then
+    eval "$PYTHON \"\$SCRIPT_DIR/diff_docx.py\" \"\$BASE\" \"\$CHANGED\" \"\$OUTPUT\""
+  else
+    python3 "$SCRIPT_DIR/diff_docx.py" "$BASE" "$CHANGED" "$OUTPUT"
+  fi
+  exit 0
+elif [[ "$ENGINE" != "word" ]]; then
+  echo "Unknown engine: $ENGINE (use word or python)" >&2
+  exit 1
+fi
+
 if [[ ( -z "$OUTPUT" || "$OUTPUT" == "-" ) && "$DETECT_FORMAT" == "false" ]]; then
   PREVIEW_DIR="$(dirname "$CHANGED")/.compare"
   mkdir -p "$PREVIEW_DIR"

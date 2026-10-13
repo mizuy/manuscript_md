@@ -29,6 +29,8 @@ The current tests cover the parts most likely to break paper builds:
 - BibTeX metadata extraction used by reference ingest notes.
 - Author/affiliation list parsing and `<sub>` remapping.
 - CSL resolution order (paper-dir override vs bundled skill styles).
+- Character-level docx diff (`diff-docx`): accept-all gives the new text,
+  reject-all gives the old text, formatting-only edits are ignored.
 
 ## Adding tests
 
