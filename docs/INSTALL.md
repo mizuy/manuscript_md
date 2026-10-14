@@ -12,7 +12,7 @@ the [Agent Skills](https://agentskills.io) `SKILL.md` standard.
 |-------|------|
 | [`skills/manuscript_md`](../skills/manuscript_md/SKILL.md) | Prose conventions, pandoc → docx, submission TIFF |
 | [`skills/manuscript-reference`](../skills/manuscript-reference/SKILL.md) | Paperpile → `references.bib`, `reference/` notes, checkme |
-| [`skills/word-docx-compare`](../skills/word-docx-compare/SKILL.md) | macOS Word Compare / `versions/` tagging |
+| [`skills/word-docx-compare`](../skills/word-docx-compare/SKILL.md) | docx tracked-changes diff (Word optional) / `versions/` tagging |
 | [`skills/strobe-checklist`](../skills/strobe-checklist/SKILL.md) | Fill / audit STROBE checklist for observational papers |
 
 ## Option A — Clone + workspace (recommended)

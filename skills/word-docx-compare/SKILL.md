@@ -1,10 +1,10 @@
 ---
 name: word-docx-compare
 description: >-
-  Compare Word docx files on macOS via Microsoft Word AppleScript automation,
-  save tracked-changes diffs, and tag paper versions under versions/.
-  Applies revised style/formatting by default without showing formatting-only
-  revisions. Use when collaborators edit in Word, generating docx diffs from
+  Compare Word docx files into a tracked-changes diff (character-level,
+  text only, no Word needed; optional Microsoft Word Compare on macOS) and
+  tag paper versions under versions/. Formatting changes are ignored by
+  default. Use when collaborators edit in Word, generating docx diffs from
   pandoc output, Word Compare from CLI, paper version tagging, or
   ADR_manuscript_vN_diff.docx.
 ---
@@ -15,9 +15,9 @@ description: >-
 
 | Use when | Do not use when |
 |----------|-----------------|
-| Word Compare / tracked-changes diff (macOS) | Markdown → docx → **manuscript_md** |
+| Tracked-changes docx diff (any OS; Word optional) | Markdown → docx → **manuscript_md** |
 | `versions/` tag + manifest diff_base | Paperpile / bib / checkme → **manuscript-reference** |
-| Collaborator return vs pandoc rebuild | Linux/CI without Microsoft Word |
+| Collaborator return vs pandoc rebuild | |
 
 **Companions:** [manuscript_md](../manuscript_md/SKILL.md) · [manuscript-reference](../manuscript-reference/SKILL.md) · [strobe-checklist](../strobe-checklist/SKILL.md)
 
@@ -33,8 +33,9 @@ Bundled with **manuscript_md**. Executable tooling:
 skills/word-docx-compare/scripts/
 ```
 
-Requires **macOS + Microsoft Word**. There is no official Word Compare CLI;
-automation uses `osascript` and Word's AppleScript `compare` command.
+The default engine is pure Python (`diff_docx.py`) and needs no Word.
+`--engine word` uses Microsoft Word on macOS via `osascript` and Word's
+AppleScript `compare` command.
 
 Pair with [manuscript_md](../manuscript_md/SKILL.md) for Markdown → docx and
 [manuscript-reference](../manuscript-reference/SKILL.md) for bibliographies.
@@ -47,7 +48,7 @@ Pair with [manuscript_md](../manuscript_md/SKILL.md) for Markdown → docx and
 - You tag a new pandoc-built `manuscript.docx` as `versions/ADR_manuscript_v{N}.docx`.
 - You want a diff against the previous version without style/formatting noise.
 
-## Critical Constraints
+## Word Engine Constraints (`--engine word` only)
 
 1. **Do not use `/tmp`.** Word's sandbox blocks grant-access there. Use paths under
    the paper directory (e.g. `docs/paper_lag0/versions/`).
@@ -75,12 +76,12 @@ SKILL="$PAPER_PROJECT/skills/word-docx-compare"
   /path/to/paper/versions/ADR_manuscript_v3_diff.docx
 ```
 
-Leave OUTPUT omitted to open the result in Word without saving.
+Leave OUTPUT omitted to write a preview under `.compare/` and open it in Word.
 
-## Python Engine (no Word)
+## Python Engine (default)
 
-`--engine python` (or `DOCX_DIFF_ENGINE=python`) skips Word and writes the
-diff with `diff_docx.py` (`manuscript-md diff-docx`):
+The default engine writes the diff with `diff_docx.py`
+(`manuscript-md diff-docx`), without Word:
 
 - Compares text only. Style, run formatting, and paragraph properties are
   ignored; the output keeps CHANGED's formatting.
@@ -90,10 +91,9 @@ diff with `diff_docx.py` (`manuscript-md diff-docx`):
   `studied` → `analysed` shows as `[-studi-]{+analys+}ed`. `--raw` turns this off.
 - Works on Linux/CI. Tracked changes already in the inputs are accepted first.
 
-```bash
-"$SKILL/scripts/compare_docx.sh" --engine python BASE.docx CHANGED.docx OUTPUT.docx
-task paper:compare ENGINE=python BASE=... CHANGED=... OUTPUT=...
-```
+To use Word Compare instead, pass `--engine word` (or set
+`DOCX_DIFF_ENGINE=word`, or `task paper:compare ENGINE=word ...`).
+`--format` (show formatting revisions) always uses Word.
 
 Table rows added or removed as a whole become row revisions. Images are
 compared by content, so a replaced figure shows as inserted.
@@ -162,9 +162,9 @@ task paper:compare \
 | Script | Role |
 |--------|------|
 | `compare_docx.applescript` | Word Compare + optional save |
-| `compare_docx.sh` | Shell wrapper; `--format` to include formatting |
+| `compare_docx.sh` | Shell wrapper; `--engine python\|word`, `--format` (Word) |
 | `apply_formatting_without_tracking.py` | Strip formatting-revision markup |
-| `diff_docx.py` | Python engine: character-level text diff, no Word |
+| `diff_docx.py` | Default engine: character-level text diff, no Word |
 | `tag_version.sh` | `versions/{PREFIX}_v{N}.docx` + `_diff.docx` |
 
 ## Local discovery

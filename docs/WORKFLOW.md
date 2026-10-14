@@ -58,7 +58,7 @@ task paper:diff                 # vs manifest diff_base
 task paper:compare BASE=... CHANGED=... OUTPUT=versions/..._diff.docx
 ```
 
-Paths for Word Compare must stay under the paper directory (`/tmp` is blocked).
+Diffs use the Python engine by default. With `--engine word`, paths must stay under the paper directory (`/tmp` is blocked).
 
 ## Consumer includes (research-repo Taskfile)
 
